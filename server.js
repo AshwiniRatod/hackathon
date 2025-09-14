@@ -59,7 +59,18 @@ const io = new Server(server, {
 app.set('io', io);
 
 // Security middleware
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://cdnjs.cloudflare.com"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net", "https://cdnjs.cloudflare.com"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com", "https://cdnjs.cloudflare.com"],
+      imgSrc: ["'self'", "data:", "https:"],
+      connectSrc: ["'self'", "ws://localhost:3000", "http://localhost:3000"]
+    }
+  }
+}));
 app.use(cors({
   origin: getAllowedOrigins(), // Use the same function as Socket.IO
   credentials: true
@@ -78,8 +89,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Serve static files for web frontend
 app.use('/web', express.static('web'));
-app.use('/admin', express.static('web'));
-app.use('/doctor', express.static('web'));
+app.use('/assets', express.static('web/assets'));
 
 // Root route to serve main web interface
 app.get('/', (req, res) => {

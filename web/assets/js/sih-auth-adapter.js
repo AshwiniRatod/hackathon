@@ -179,12 +179,12 @@ const SIHAuthAdapter = {
     createDemoCredentials: function() {
         return {
             admin: {
-                email: 'admin@nabha.com',
+                email: 'admin@sih.com',
                 password: 'admin123',
                 role: 'admin'
             },
             doctor: {
-                email: 'doctor@nabha.com', 
+                email: 'doctor@sih.com', 
                 password: 'doctor123',
                 role: 'doctor'
             },
@@ -241,14 +241,13 @@ const SIHAuthAdapter = {
                 console.log('✅ Demo mode authentication successful');
                 return demoResult;
             } catch (demoError) {
-                throw new Error(`Authentication failed: ${error.message}. Demo credentials: admin@nabha.com/admin123`);
+                throw new Error(`Authentication failed: ${error.message}. Demo credentials: admin@sih.com/admin123`);
             }
         }
     }
 };
 
-// Override the global loginUser function to use SIH adapter - DISABLED FOR DEBUGGING
-/*
+// Override the global loginUser function to use SIH adapter
 window.loginUser = async function(role, email, password, rememberMe = false) {
     try {
         console.log(`🚀 Starting ${role} login for ${email}...`);
@@ -311,7 +310,6 @@ window.loginUser = async function(role, email, password, rememberMe = false) {
         throw error;
     }
 };
-*/
 
 // Make SIHAuthAdapter available globally
 window.SIHAuthAdapter = SIHAuthAdapter;

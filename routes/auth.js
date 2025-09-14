@@ -130,40 +130,69 @@ router.post('/login', async (req, res) => {
 
     let user;
     
-    // Check if this is admin login with email
-    if (email && email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
-      // Find or create admin user
-      user = await User.findOne({ email: process.env.ADMIN_EMAIL });
+    // Check if this is email-based login
+    if (email) {
+      // Look for user with email (could be admin or doctor)
+      user = await User.findOne({ email: email });
       
-      if (!user) {
-        // Create admin user if doesn't exist
-        user = new User({
-          email: process.env.ADMIN_EMAIL,
-          name: 'System Admin',
-          role: 'admin',
-          phone: '9999999999', // dummy phone for admin
-          password: process.env.ADMIN_PASSWORD,
-          isVerified: true
-        });
-        await user.save();
+      if (user) {
+        // Verify password using bcrypt
+        const isPasswordValid = await user.comparePassword(password);
+        if (!isPasswordValid) {
+          return res.status(401).json({ 
+            success: false,
+            message: 'Invalid email or password' 
+          });
+        }
+      } else {
+        // Fallback to environment variables for admin only
+        if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
+          // Create admin user if doesn't exist
+          user = new User({
+            email: process.env.ADMIN_EMAIL,
+            name: 'System Admin',
+            role: 'admin',
+            phone: '9999999999',
+            password: process.env.ADMIN_PASSWORD,
+            isVerified: true
+          });
+          await user.save();
+        } else {
+          return res.status(401).json({ 
+            success: false,
+            message: 'Invalid email or password' 
+          });
+        }
       }
     } else if (phone) {
       // Regular user login with phone
       user = await User.findOne({ phone });
       if (!user) {
-        return res.status(401).json({ message: 'Invalid credentials' });
+        return res.status(401).json({ 
+          success: false,
+          message: 'Invalid credentials' 
+        });
       }
 
       if (!user.isVerified) {
-        return res.status(401).json({ message: 'Please verify your phone number first' });
+        return res.status(401).json({ 
+          success: false,
+          message: 'Please verify your phone number first' 
+        });
       }
 
       const isPasswordValid = await user.comparePassword(password);
       if (!isPasswordValid) {
-        return res.status(401).json({ message: 'Invalid credentials' });
+        return res.status(401).json({ 
+          success: false,
+          message: 'Invalid credentials' 
+        });
       }
     } else {
-      return res.status(400).json({ message: 'Please provide phone number or email' });
+      return res.status(400).json({ 
+        success: false,
+        message: 'Please provide phone number or email' 
+      });
     }
 
     user.lastLogin = new Date();
@@ -172,6 +201,7 @@ router.post('/login', async (req, res) => {
     const token = generateToken(user._id);
 
     res.json({
+      success: true,
       message: 'Login successful',
       token,
       user: {
@@ -186,7 +216,11 @@ router.post('/login', async (req, res) => {
     });
   } catch (error) {
     console.error('Login error:', error);
-    res.status(500).json({ message: 'Login failed', error: error.message });
+    res.status(500).json({ 
+      success: false,
+      message: 'Login failed', 
+      error: error.message 
+    });
   }
 });
 

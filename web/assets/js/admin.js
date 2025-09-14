@@ -1,102 +1,52 @@
-// Enhanced Admin Dashboard JavaScript for Nabha Telemedicine Management System
+// Admin Dashboard JavaScript for Nabha Telemedicine
 
 const AdminDashboard = {
     charts: {},
     refreshInterval: null,
-    currentSection: 'dashboard',
     
     // Initialize admin dashboard
     init: async function() {
-        ConfigUtils.log('info', 'Initializing Enhanced Admin Dashboard');
+        ConfigUtils.log('info', 'Initializing Admin Dashboard');
         
         try {
-            // Check authentication first
-            this.checkAuthentication();
-            
-            // Load dashboard data
             await this.loadDashboardData();
-            
-            // Setup event listeners
             this.setupEventListeners();
-            
-            // Initialize charts
             this.setupCharts();
-            
-            // Setup auto refresh
             this.setupAutoRefresh();
-            
-            // Setup WebSocket listeners for real-time updates
             this.setupWebSocketListeners();
             
-            ConfigUtils.log('info', 'Enhanced Admin Dashboard initialized successfully');
+            ConfigUtils.log('info', 'Admin Dashboard initialized successfully');
         } catch (error) {
-            ConfigUtils.log('error', 'Failed to initialize Enhanced Admin Dashboard', error);
-            this.showErrorMessage('Failed to load dashboard data');
+            ConfigUtils.log('error', 'Failed to initialize Admin Dashboard', error);
+            ApiUtils.showErrorToast('Failed to load dashboard data');
         }
     },
 
-    // Check authentication and role
-    checkAuthentication: function() {
-        const token = localStorage.getItem('nabha_auth_token');
-        const userData = localStorage.getItem('nabha_user_data');
-        
-        if (!token || !userData) {
-            window.location.href = 'admin-login.html';
-            return false;
-        }
-
-        try {
-            const user = JSON.parse(userData);
-            if (user.role !== 'admin') {
-                alert('Access denied. Admin privileges required.');
-                window.location.href = 'admin-login.html';
-                return false;
-            }
-            
-            // Update profile display
-            this.updateProfileDisplay(user);
-            return true;
-        } catch (error) {
-            ConfigUtils.log('error', 'Error parsing user data', error);
-            window.location.href = 'admin-login.html';
-            return false;
-        }
-    },
-
-    // Update profile display in header
-    updateProfileDisplay: function(user) {
-        const profileName = document.querySelector('.profile-name');
-        const profileAvatar = document.querySelector('.profile-avatar');
-        
-        if (profileName) profileName.textContent = user.name || 'Admin User';
-        if (profileAvatar) profileAvatar.textContent = (user.name || 'Admin')[0].toUpperCase();
-    },
-
-    // Load comprehensive dashboard data
+    // Load dashboard data
     loadDashboardData: async function() {
         try {
-            ConfigUtils.log('info', 'Loading dashboard data...');
+            // Load overview statistics
+            await this.loadOverviewStats();
             
-            // Load all dashboard sections in parallel
-            const promises = [
-                this.loadOverviewStats(),
-                this.loadUserStats(),
-                this.loadDoctorStats(),
-                this.loadRecentActivity(),
-                this.loadSosAlerts(),
-                this.loadSystemHealth()
-            ];
+            // Load SOS alerts
+            await this.loadSosAlerts();
             
-            await Promise.allSettled(promises);
+            // Load user management data
+            await this.loadUserManagement();
             
-            ConfigUtils.log('info', 'Dashboard data loaded successfully');
+            // Load recent activity
+            await this.loadRecentActivity();
+            
+            // Load analytics data
+            await this.loadAnalyticsData();
+            
         } catch (error) {
             ConfigUtils.log('error', 'Error loading dashboard data', error);
             throw error;
         }
     },
 
-    // Load overview statistics with enhanced metrics
+    // Load overview statistics
     loadOverviewStats: async function() {
         try {
             const response = await AdminApi.getStatistics();

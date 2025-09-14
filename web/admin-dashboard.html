@@ -3,207 +3,146 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - Nabha Telemedicine Management System</title>
+    <title>Admin Dashboard - Nabha Telemedicine</title>
     <link rel="stylesheet" href="assets/css/main.css">
     <link rel="stylesheet" href="assets/css/dashboard.css">
     <link rel="stylesheet" href="assets/css/components.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
     <style>
         /* Enhanced Admin Dashboard Styles */
-        .admin-dashboard {
-            display: flex;
-            min-height: 100vh;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
             font-family: 'Inter', sans-serif;
             background: #f8fafc;
+            color: #374151;
+            line-height: 1.6;
         }
 
-        /* Enhanced Sidebar */
-        .admin-sidebar {
-            width: 280px;
-            background: linear-gradient(180deg, #1e40af 0%, #1e3a8a 100%);
-            color: white;
-            position: fixed;
-            height: 100vh;
-            overflow-y: auto;
-            transition: all 0.3s ease;
-            z-index: 1000;
-        }
-
-        .admin-sidebar.collapsed {
-            width: 80px;
-        }
-
-        .sidebar-header {
-            padding: 2rem 1.5rem;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            text-align: center;
-        }
-
-        .sidebar-logo {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-        }
-
-        .sidebar-subtitle {
-            font-size: 0.875rem;
-            opacity: 0.8;
-        }
-
-        .sidebar-nav {
-            padding: 1rem 0;
-        }
-
-        .nav-section {
-            margin-bottom: 2rem;
-        }
-
-        .nav-section-title {
-            padding: 0 1.5rem;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            opacity: 0.6;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-        }
-
-        .nav-item {
-            display: flex;
-            align-items: center;
-            padding: 0.75rem 1.5rem;
-            color: rgba(255,255,255,0.9);
-            text-decoration: none;
-            transition: all 0.2s ease;
-            cursor: pointer;
-        }
-
-        .nav-item:hover {
-            background: rgba(255,255,255,0.1);
-            color: white;
-        }
-
-        .nav-item.active {
-            background: rgba(255,255,255,0.15);
-            color: white;
-            border-right: 3px solid #fbbf24;
-        }
-
-        .nav-item i {
-            width: 20px;
-            margin-right: 1rem;
-            font-size: 1.1rem;
-        }
-
-        /* Main Content Area */
-        .admin-main {
-            flex: 1;
-            margin-left: 280px;
-            transition: all 0.3s ease;
-        }
-
-        .admin-main.expanded {
-            margin-left: 80px;
+        .dashboard-container {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            grid-template-rows: 70px 1fr;
+            grid-template-areas: 
+                "sidebar header"
+                "sidebar main";
+            min-height: 100vh;
         }
 
         /* Enhanced Header */
-        .admin-header {
+        .dashboard-header-bar {
+            grid-area: header;
             background: white;
-            padding: 1rem 2rem;
             border-bottom: 1px solid #e5e7eb;
             display: flex;
-            justify-content: between;
             align-items: center;
-            position: sticky;
-            top: 0;
+            justify-content: space-between;
+            padding: 0 30px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            position: relative;
             z-index: 100;
         }
 
         .header-left {
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 15px;
         }
 
-        .sidebar-toggle {
-            background: none;
-            border: none;
-            font-size: 1.2rem;
+        .breadcrumb {
             color: #6b7280;
-            cursor: pointer;
-            padding: 0.5rem;
-            border-radius: 0.5rem;
-            transition: all 0.2s ease;
-        }
-
-        .sidebar-toggle:hover {
-            background: #f3f4f6;
-            color: #374151;
-        }
-
-        .header-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: #111827;
+            font-size: 0.9rem;
         }
 
         .header-right {
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 15px;
         }
 
-        .header-notification {
+        .header-search {
+            position: relative;
+        }
+
+        .header-search input {
+            padding: 8px 15px 8px 40px;
+            border: 1px solid #d1d5db;
+            border-radius: 20px;
+            background: #f9fafb;
+            font-size: 0.9rem;
+            width: 300px;
+            transition: all 0.3s ease;
+        }
+
+        .header-search input:focus {
+            outline: none;
+            border-color: #10b981;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+
+        .header-search i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6b7280;
+        }
+
+        .notification-btn {
             position: relative;
             background: none;
             border: none;
-            font-size: 1.1rem;
             color: #6b7280;
+            font-size: 1.2rem;
             cursor: pointer;
-            padding: 0.5rem;
-            border-radius: 0.5rem;
-            transition: all 0.2s ease;
+            padding: 8px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
         }
 
-        .header-notification:hover {
+        .notification-btn:hover {
             background: #f3f4f6;
             color: #374151;
         }
 
         .notification-badge {
             position: absolute;
-            top: 0.2rem;
-            right: 0.2rem;
+            top: 2px;
+            right: 2px;
             background: #ef4444;
             color: white;
             font-size: 0.7rem;
-            padding: 0.2rem 0.4rem;
-            border-radius: 50px;
-            min-width: 1.2rem;
+            padding: 2px 6px;
+            border-radius: 10px;
+            min-width: 18px;
             text-align: center;
         }
 
-        .admin-profile {
+        .user-menu {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
+            gap: 10px;
             cursor: pointer;
-            padding: 0.5rem;
-            border-radius: 0.5rem;
-            transition: all 0.2s ease;
+            padding: 8px 12px;
+            border-radius: 12px;
+            transition: all 0.3s ease;
         }
 
-        .admin-profile:hover {
+        .user-menu:hover {
             background: #f3f4f6;
         }
 
-        .profile-avatar {
-            width: 2rem;
-            height: 2rem;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        .user-avatar {
+            width: 35px;
+            height: 35px;
+            background: linear-gradient(135deg, #10b981, #059669);
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -212,335 +151,451 @@
             font-weight: 600;
         }
 
-        .profile-info {
+        /* Enhanced Sidebar */
+        .sidebar {
+            grid-area: sidebar;
+            background: #1f2937;
+            color: white;
+            overflow-y: auto;
+            border-right: 1px solid #374151;
+        }
+
+        .sidebar-header {
+            padding: 20px 25px;
+            border-bottom: 1px solid #374151;
+        }
+
+        .sidebar-logo {
             display: flex;
-            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #10b981;
         }
 
-        .profile-name {
-            font-weight: 500;
-            color: #111827;
+        .sidebar-logo i {
+            font-size: 2rem;
         }
 
-        .profile-role {
-            font-size: 0.75rem;
+        .sidebar-nav {
+            padding: 20px 0;
+        }
+
+        .nav-section {
+            margin-bottom: 30px;
+        }
+
+        .nav-section-title {
+            padding: 0 25px 10px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #9ca3af;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 25px;
+            color: #d1d5db;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-item:hover {
+            background: #374151;
+            color: white;
+        }
+
+        .nav-item.active {
+            background: linear-gradient(90deg, #10b981, transparent);
+            color: white;
+        }
+
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: #10b981;
+        }
+
+        .nav-item i {
+            width: 20px;
+            margin-right: 15px;
+            font-size: 1.1rem;
+        }
+
+        .nav-badge {
+            margin-left: auto;
+            background: #ef4444;
+            color: white;
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 10px;
+            min-width: 18px;
+            text-align: center;
+        }
+
+        /* Enhanced Main Content */
+        .main-content {
+            grid-area: main;
+            padding: 30px;
+            overflow-y: auto;
+            max-height: calc(100vh - 70px);
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            background: white;
+            padding: 25px 30px;
+            border-radius: 16px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .dashboard-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin: 0;
+        }
+
+        .dashboard-subtitle {
             color: #6b7280;
+            font-size: 1rem;
+            margin-top: 5px;
         }
 
-        /* Content Area */
-        .dashboard-content {
-            padding: 2rem;
+        .dashboard-actions {
+            display: flex;
+            gap: 12px;
         }
 
-        /* Statistics Cards */
-        .stats-grid {
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-outline {
+            background: white;
+            color: #374151;
+            border: 1px solid #d1d5db;
+        }
+
+        .btn-outline:hover {
+            background: #f9fafb;
+            border-color: #10b981;
+            color: #10b981;
+        }
+
+        /* Overview Cards */
+        .overview-section {
+            margin-bottom: 30px;
+        }
+
+        .overview-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
+            gap: 20px;
+            margin-bottom: 30px;
         }
 
-        .stat-card {
+        .overview-card {
             background: white;
-            padding: 1.5rem;
-            border-radius: 1rem;
+            padding: 25px;
+            border-radius: 16px;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            border: 1px solid #e5e7eb;
-            transition: all 0.2s ease;
+            border: 1px solid #f3f4f6;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
 
-        .stat-card:hover {
+        .overview-card:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
 
-        .stat-header {
+        .overview-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #10b981, #059669);
+        }
+
+        .card-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1rem;
+            margin-bottom: 15px;
         }
 
-        .stat-title {
-            font-size: 0.875rem;
-            color: #6b7280;
-            font-weight: 500;
-        }
-
-        .stat-icon {
-            width: 2.5rem;
-            height: 2.5rem;
-            border-radius: 0.75rem;
+        .card-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.25rem;
+            color: white;
+            font-size: 1.5rem;
         }
 
-        .stat-icon.users { background: #dbeafe; color: #2563eb; }
-        .stat-icon.doctors { background: #dcfce7; color: #16a34a; }
-        .stat-icon.appointments { background: #fef3c7; color: #d97706; }
-        .stat-icon.revenue { background: #fce7f3; color: #c2185b; }
-
-        .stat-value {
-            font-size: 2rem;
+        .card-value {
+            font-size: 2.5rem;
             font-weight: 700;
-            color: #111827;
-            margin-bottom: 0.5rem;
+            color: #1f2937;
+            margin-bottom: 5px;
         }
 
-        .stat-change {
-            font-size: 0.875rem;
+        .card-label {
+            color: #6b7280;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .card-change {
             display: flex;
             align-items: center;
-            gap: 0.25rem;
+            gap: 5px;
+            font-size: 0.8rem;
+            font-weight: 500;
         }
 
-        .stat-change.positive { color: #16a34a; }
-        .stat-change.negative { color: #dc2626; }
+        .card-change.positive {
+            color: #059669;
+        }
+
+        .card-change.negative {
+            color: #dc2626;
+        }
+
+        /* SOS Alerts Section */
+        .sos-alerts-section {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1f2937;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .alert-count {
+            background: #ef4444;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-left: auto;
+        }
+
+        .sos-alert-card {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-left: 4px solid #ef4444;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .sos-alert-card:hover {
+            background: #fef2f2;
+            border-color: #f87171;
+            transform: translateX(2px);
+        }
+
+        .alert-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .alert-priority {
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .priority-critical {
+            background: #fecaca;
+            color: #991b1b;
+        }
+
+        .priority-high {
+            background: #fed7aa;
+            color: #9a3412;
+        }
+
+        .priority-medium {
+            background: #fef3c7;
+            color: #92400e;
+        }
 
         /* Charts Section */
         .charts-section {
             display: grid;
             grid-template-columns: 2fr 1fr;
-            gap: 1.5rem;
-            margin-bottom: 2rem;
+            gap: 20px;
+            margin-bottom: 30px;
         }
 
-        .chart-card {
+        .chart-container {
             background: white;
-            padding: 1.5rem;
-            border-radius: 1rem;
+            padding: 25px;
+            border-radius: 16px;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            border: 1px solid #e5e7eb;
         }
 
         .chart-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
+            margin-bottom: 20px;
         }
 
         .chart-title {
-            font-size: 1.125rem;
-            font-weight: 600;
-            color: #111827;
-        }
-
-        .chart-period {
-            display: flex;
-            gap: 0.5rem;
-        }
-
-        .period-btn {
-            padding: 0.5rem 1rem;
-            border: 1px solid #e5e7eb;
-            background: white;
-            border-radius: 0.5rem;
-            font-size: 0.875rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .period-btn.active {
-            background: #2563eb;
-            color: white;
-            border-color: #2563eb;
-        }
-
-        /* Management Sections */
-        .management-section {
-            margin-bottom: 2rem;
-        }
-
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
-
-        .section-title {
             font-size: 1.25rem;
             font-weight: 600;
-            color: #111827;
+            color: #1f2937;
+            margin-bottom: 5px;
         }
 
-        .section-actions {
-            display: flex;
-            gap: 0.75rem;
+        .chart-subtitle {
+            color: #6b7280;
+            font-size: 0.9rem;
         }
 
-        .btn {
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-            font-weight: 500;
-            font-size: 0.875rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            border: none;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .btn-primary {
-            background: #2563eb;
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: #1d4ed8;
-        }
-
-        .btn-secondary {
-            background: #f3f4f6;
-            color: #374151;
-            border: 1px solid #d1d5db;
-        }
-
-        .btn-secondary:hover {
-            background: #e5e7eb;
-        }
-
-        /* Data Tables */
-        .data-table-container {
+        /* Recent Activity */
+        .activity-section {
             background: white;
-            border-radius: 1rem;
+            border-radius: 16px;
+            padding: 25px;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            border: 1px solid #e5e7eb;
-            overflow: hidden;
         }
 
-        .table-header {
-            padding: 1.5rem;
-            border-bottom: 1px solid #e5e7eb;
+        .activity-item {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-        }
-
-        .table-title {
-            font-weight: 600;
-            color: #111827;
-        }
-
-        .table-search {
-            display: flex;
-            gap: 1rem;
-            align-items: center;
-        }
-
-        .search-input {
-            padding: 0.5rem 1rem;
-            border: 1px solid #d1d5db;
-            border-radius: 0.5rem;
-            font-size: 0.875rem;
-            width: 250px;
-        }
-
-        .filter-select {
-            padding: 0.5rem 1rem;
-            border: 1px solid #d1d5db;
-            border-radius: 0.5rem;
-            font-size: 0.875rem;
-            background: white;
-        }
-
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .data-table th {
-            background: #f9fafb;
-            padding: 1rem 1.5rem;
-            text-align: left;
-            font-weight: 600;
-            color: #374151;
-            font-size: 0.875rem;
-            border-bottom: 1px solid #e5e7eb;
-        }
-
-        .data-table td {
-            padding: 1rem 1.5rem;
+            gap: 15px;
+            padding: 15px 0;
             border-bottom: 1px solid #f3f4f6;
-            color: #374151;
         }
 
-        .data-table tr:hover {
-            background: #f9fafb;
+        .activity-item:last-child {
+            border-bottom: none;
         }
 
-        .status-badge {
-            padding: 0.25rem 0.75rem;
-            border-radius: 50px;
-            font-size: 0.75rem;
-            font-weight: 500;
-        }
-
-        .status-active { background: #dcfce7; color: #166534; }
-        .status-inactive { background: #fee2e2; color: #991b1b; }
-        .status-pending { background: #fef3c7; color: #92400e; }
-        .status-verified { background: #dbeafe; color: #1e40af; }
-
-        .table-actions {
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
             display: flex;
-            gap: 0.5rem;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1rem;
         }
 
-        .action-btn {
-            padding: 0.25rem 0.5rem;
-            border: none;
-            border-radius: 0.375rem;
-            cursor: pointer;
-            font-size: 0.75rem;
-            transition: all 0.2s ease;
+        .activity-content {
+            flex: 1;
         }
 
-        .action-btn.view { background: #dbeafe; color: #1e40af; }
-        .action-btn.edit { background: #fef3c7; color: #92400e; }
-        .action-btn.delete { background: #fee2e2; color: #991b1b; }
+        .activity-title {
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 2px;
+        }
 
-        .action-btn:hover {
-            transform: scale(1.05);
+        .activity-description {
+            font-size: 0.9rem;
+            color: #6b7280;
+        }
+
+        .activity-time {
+            font-size: 0.8rem;
+            color: #9ca3af;
         }
 
         /* Responsive Design */
-        @media (max-width: 1024px) {
-            .admin-sidebar {
-                transform: translateX(-100%);
-            }
-
-            .admin-sidebar.mobile-open {
-                transform: translateX(0);
-            }
-
-            .admin-main {
-                margin-left: 0;
-            }
-
-            .charts-section {
-                grid-template-columns: 1fr;
-            }
-
-            .stats-grid {
-                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        @media (max-width: 1200px) {
+            .dashboard-container {
+                grid-template-columns: 250px 1fr;
             }
         }
 
         @media (max-width: 768px) {
-            .dashboard-content {
-                padding: 1rem;
-            }
-
-            .admin-header {
-                padding: 1rem;
-            }
-
-            .stats-grid {
+            .dashboard-container {
                 grid-template-columns: 1fr;
+                grid-template-areas: 
+                    "header"
+                    "main";
+            }
+            
+            .sidebar {
+                display: none;
+            }
+            
+            .overview-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .charts-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .dashboard-header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
             }
         }
 
@@ -549,14 +604,15 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 2rem;
+            height: 200px;
+            color: #6b7280;
         }
 
         .spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid #f3f4f6;
-            border-top: 4px solid #2563eb;
+            width: 30px;
+            height: 30px;
+            border: 3px solid #f3f4f6;
+            border-top: 3px solid #10b981;
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
@@ -565,675 +621,479 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-
-        /* Modal Styles */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 2000;
-        }
-
-        .modal {
-            background: white;
-            border-radius: 1rem;
-            padding: 2rem;
-            width: 90%;
-            max-width: 600px;
-            max-height: 80vh;
-            overflow-y: auto;
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
-
-        .modal-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: #111827;
-        }
-
-        .modal-close {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            color: #6b7280;
-            cursor: pointer;
-        }
     </style>
 </head>
-<body>
-    <div class="admin-dashboard">
-        <!-- Enhanced Sidebar -->
-        <aside class="admin-sidebar" id="adminSidebar">
-            <div class="sidebar-header">
-                <div class="sidebar-logo">🏥 Nabha</div>
-                <div class="sidebar-subtitle">Telemedicine Admin</div>
+<body class="dashboard-page">
+    <div class="dashboard-container">
+        <!-- Enhanced Header -->
+        <header class="dashboard-header-bar">
+            <div class="header-left">
+                <div class="breadcrumb">
+                    <i class="fas fa-home"></i> / Admin / Dashboard
+                </div>
             </div>
-            
+            <div class="header-right">
+                <div class="header-search">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search patients, doctors, reports...">
+                </div>
+                <button class="notification-btn" id="notificationBtn">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge" id="notificationCount">3</span>
+                </button>
+                <div class="user-menu" id="userMenu">
+                    <div class="user-avatar">A</div>
+                    <div>
+                        <div style="font-weight: 600; font-size: 0.9rem;">Admin User</div>
+                        <div style="font-size: 0.8rem; color: #6b7280;">Administrator</div>
+                    </div>
+                    <i class="fas fa-chevron-down" style="margin-left: 8px; font-size: 0.8rem; color: #6b7280;"></i>
+                </div>
+            </div>
+        </header>
+
+        <!-- Enhanced Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <i class="fas fa-heartbeat"></i>
+                    <span>Nabha Admin</span>
+                </div>
+            </div>
             <nav class="sidebar-nav">
                 <div class="nav-section">
-                    <div class="nav-section-title">Overview</div>
-                    <a href="#dashboard" class="nav-item active" data-section="dashboard">
+                    <div class="nav-section-title">Main</div>
+                    <a href="#" class="nav-item active">
                         <i class="fas fa-chart-pie"></i>
                         <span>Dashboard</span>
                     </a>
-                    <a href="#analytics" class="nav-item" data-section="analytics">
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-ambulance"></i>
+                        <span>SOS Alerts</span>
+                        <span class="nav-badge">5</span>
+                    </a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Management</div>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-users"></i>
+                        <span>Users</span>
+                    </a>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-user-md"></i>
+                        <span>Doctors</span>
+                    </a>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-user-nurse"></i>
+                        <span>ASHA Workers</span>
+                    </a>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-hospital-user"></i>
+                        <span>Patients</span>
+                    </a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Healthcare</div>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-prescription-bottle-alt"></i>
+                        <span>Prescriptions</span>
+                    </a>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-clinic-medical"></i>
+                        <span>Health Records</span>
+                    </a>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-store"></i>
+                        <span>Pharmacies</span>
+                    </a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">System</div>
+                    <a href="#" class="nav-item">
                         <i class="fas fa-chart-line"></i>
                         <span>Analytics</span>
                     </a>
-                </div>
-
-                <div class="nav-section">
-                    <div class="nav-section-title">Management</div>
-                    <a href="#users" class="nav-item" data-section="users">
-                        <i class="fas fa-users"></i>
-                        <span>User Management</span>
-                    </a>
-                    <a href="#doctors" class="nav-item" data-section="doctors">
-                        <i class="fas fa-user-md"></i>
-                        <span>Doctor Management</span>
-                    </a>
-                    <a href="#appointments" class="nav-item" data-section="appointments">
-                        <i class="fas fa-calendar-check"></i>
-                        <span>Appointments</span>
-                    </a>
-                    <a href="#sos" class="nav-item" data-section="sos">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <span>SOS Alerts</span>
-                    </a>
-                </div>
-
-                <div class="nav-section">
-                    <div class="nav-section-title">System</div>
-                    <a href="#communications" class="nav-item" data-section="communications">
-                        <i class="fas fa-envelope"></i>
-                        <span>Communications</span>
-                    </a>
-                    <a href="#settings" class="nav-item" data-section="settings">
+                    <a href="#" class="nav-item">
                         <i class="fas fa-cog"></i>
                         <span>Settings</span>
                     </a>
-                    <a href="#reports" class="nav-item" data-section="reports">
-                        <i class="fas fa-file-alt"></i>
-                        <span>Reports</span>
+                    <a href="/" class="nav-item">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Logout</span>
                     </a>
                 </div>
             </nav>
         </aside>
 
-        <!-- Main Content -->
-        <div class="admin-main" id="adminMain">
-            <!-- Enhanced Header -->
-            <header class="admin-header">
-                <div class="header-left">
-                    <button class="sidebar-toggle" id="sidebarToggle">
-                        <i class="fas fa-bars"></i>
+        <!-- Enhanced Main Content -->
+        <main class="main-content">
+            <div class="dashboard-header">
+                <div>
+                    <h1 class="dashboard-title">Admin Dashboard</h1>
+                    <div class="dashboard-subtitle">Welcome back! Here's what's happening in your telemedicine system.</div>
+                </div>
+                <div class="dashboard-actions">
+                    <button class="btn btn-outline" id="refreshBtn">
+                        <i class="fas fa-sync-alt"></i> Refresh Data
                     </button>
-                    <h1 class="header-title" id="pageTitle">Dashboard Overview</h1>
+                    <button class="btn btn-primary" id="exportBtn">
+                        <i class="fas fa-download"></i> Export Report
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Overview Cards -->
+            <section class="overview-section">
+                <div class="overview-grid">
+                    <div class="overview-card">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                        </div>
+                        <div class="card-value" id="totalPatients">1,247</div>
+                        <div class="card-label">Total Patients</div>
+                        <div class="card-change positive">
+                            <i class="fas fa-arrow-up"></i> +12% from last month
+                        </div>
+                    </div>
+                    <div class="overview-card">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <i class="fas fa-user-md"></i>
+                            </div>
+                        </div>
+                        <div class="card-value" id="totalDoctors">89</div>
+                        <div class="card-label">Active Doctors</div>
+                        <div class="card-change positive">
+                            <i class="fas fa-arrow-up"></i> +5% from last month
+                        </div>
+                    </div>
+                    <div class="overview-card">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <i class="fas fa-user-nurse"></i>
+                            </div>
+                        </div>
+                        <div class="card-value" id="totalASHA">156</div>
+                        <div class="card-label">ASHA Workers</div>
+                        <div class="card-change positive">
+                            <i class="fas fa-arrow-up"></i> +8% from last month
+                        </div>
+                    </div>
+                    <div class="overview-card">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <i class="fas fa-ambulance"></i>
+                            </div>
+                        </div>
+                        <div class="card-value" id="activeSOS">5</div>
+                        <div class="card-label">Active SOS Alerts</div>
+                        <div class="card-change negative">
+                            <i class="fas fa-exclamation-triangle"></i> Requires attention
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SOS Alerts Section -->
+            <section class="sos-alerts-section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-ambulance"></i>
+                        Active SOS Alerts
+                    </h2>
+                    <span class="alert-count" id="sosAlertCount">5</span>
+                </div>
+                <div id="sosAlertsContainer" class="sos-alerts-container">
+                    <!-- Sample SOS Alerts -->
+                    <div class="sos-alert-card">
+                        <div class="alert-header">
+                            <div>
+                                <strong>Emergency - Chest Pain</strong>
+                                <div style="font-size: 0.9rem; color: #6b7280; margin-top: 2px;">
+                                    Patient: Rajesh Kumar | Age: 67 | Location: Nabha Rural
+                                </div>
+                            </div>
+                            <span class="alert-priority priority-critical">Critical</span>
+                        </div>
+                        <div style="color: #6b7280; font-size: 0.9rem; margin-bottom: 10px;">
+                            "Severe chest pain, difficulty breathing, sweating profusely"
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-size: 0.8rem; color: #9ca3af;">2 minutes ago</span>
+                            <div style="display: flex; gap: 8px;">
+                                <button class="btn" style="padding: 5px 12px; font-size: 0.8rem; background: #ef4444; color: white; border-radius: 6px;">
+                                    <i class="fas fa-phone"></i> Call
+                                </button>
+                                <button class="btn" style="padding: 5px 12px; font-size: 0.8rem; background: #10b981; color: white; border-radius: 6px;">
+                                    <i class="fas fa-map-marker-alt"></i> Locate
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="sos-alert-card">
+                        <div class="alert-header">
+                            <div>
+                                <strong>Pregnancy Emergency</strong>
+                                <div style="font-size: 0.9rem; color: #6b7280; margin-top: 2px;">
+                                    Patient: Priya Sharma | Age: 28 | Location: Patiala District
+                                </div>
+                            </div>
+                            <span class="alert-priority priority-high">High</span>
+                        </div>
+                        <div style="color: #6b7280; font-size: 0.9rem; margin-bottom: 10px;">
+                            "Labor pains started, unable to reach hospital due to weather"
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-size: 0.8rem; color: #9ca3af;">8 minutes ago</span>
+                            <div style="display: flex; gap: 8px;">
+                                <button class="btn" style="padding: 5px 12px; font-size: 0.8rem; background: #ef4444; color: white; border-radius: 6px;">
+                                    <i class="fas fa-phone"></i> Call
+                                </button>
+                                <button class="btn" style="padding: 5px 12px; font-size: 0.8rem; background: #10b981; color: white; border-radius: 6px;">
+                                    <i class="fas fa-map-marker-alt"></i> Locate
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Charts Section -->
+            <section class="charts-section">
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3 class="chart-title">Consultation Trends</h3>
+                        <p class="chart-subtitle">Monthly consultation statistics</p>
+                    </div>
+                    <canvas id="consultationChart" width="400" height="200"></canvas>
                 </div>
                 
-                <div class="header-right">
-                    <button class="header-notification" id="notificationBtn">
-                        <i class="fas fa-bell"></i>
-                        <span class="notification-badge" id="notificationCount">3</span>
-                    </button>
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3 class="chart-title">User Distribution</h3>
+                        <p class="chart-subtitle">System users breakdown</p>
+                    </div>
+                    <canvas id="userChart" width="300" height="300"></canvas>
+                </div>
+            </section>
+
+            <!-- Recent Activity -->
+            <section class="activity-section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-clock"></i>
+                        Recent Activity
+                    </h2>
+                </div>
+                <div class="activity-list">
+                    <div class="activity-item">
+                        <div class="activity-icon" style="background: #10b981;">
+                            <i class="fas fa-user-plus"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-title">New Doctor Registration</div>
+                            <div class="activity-description">Dr. Amit Singh joined as Cardiologist</div>
+                        </div>
+                        <div class="activity-time">5 minutes ago</div>
+                    </div>
                     
-                    <div class="admin-profile" id="adminProfile">
-                        <div class="profile-avatar">A</div>
-                        <div class="profile-info">
-                            <div class="profile-name">Admin User</div>
-                            <div class="profile-role">System Administrator</div>
+                    <div class="activity-item">
+                        <div class="activity-icon" style="background: #3b82f6;">
+                            <i class="fas fa-video"></i>
                         </div>
-                        <i class="fas fa-chevron-down"></i>
+                        <div class="activity-content">
+                            <div class="activity-title">Telemedicine Session Completed</div>
+                            <div class="activity-description">Dr. Sharma completed consultation with Patient #1023</div>
+                        </div>
+                        <div class="activity-time">12 minutes ago</div>
+                    </div>
+                    
+                    <div class="activity-item">
+                        <div class="activity-icon" style="background: #f59e0b;">
+                            <i class="fas fa-prescription-bottle-alt"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-title">Prescription Issued</div>
+                            <div class="activity-description">New prescription for hypertension medication</div>
+                        </div>
+                        <div class="activity-time">18 minutes ago</div>
+                    </div>
+                    
+                    <div class="activity-item">
+                        <div class="activity-icon" style="background: #8b5cf6;">
+                            <i class="fas fa-user-nurse"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-title">ASHA Report Submitted</div>
+                            <div class="activity-description">Community health report from Rural Area Block-5</div>
+                        </div>
+                        <div class="activity-time">25 minutes ago</div>
+                    </div>
+                    
+                    <div class="activity-item">
+                        <div class="activity-icon" style="background: #ef4444;">
+                            <i class="fas fa-ambulance"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-title">SOS Alert Resolved</div>
+                            <div class="activity-description">Emergency case resolved - Patient stable</div>
+                        </div>
+                        <div class="activity-time">32 minutes ago</div>
                     </div>
                 </div>
-            </header>
-
-            <!-- Content Area -->
-            <main class="dashboard-content" id="mainContent">
-                <!-- Dashboard Section (Default) -->
-                <div id="dashboardSection" class="content-section active">
-                    <!-- Statistics Cards -->
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-header">
-                                <div class="stat-title">Total Users</div>
-                                <div class="stat-icon users">
-                                    <i class="fas fa-users"></i>
-                                </div>
-                            </div>
-                            <div class="stat-value" id="totalUsers">0</div>
-                            <div class="stat-change positive">
-                                <i class="fas fa-arrow-up"></i>
-                                <span>+12% from last month</span>
-                            </div>
-                        </div>
-
-                        <div class="stat-card">
-                            <div class="stat-header">
-                                <div class="stat-title">Active Doctors</div>
-                                <div class="stat-icon doctors">
-                                    <i class="fas fa-user-md"></i>
-                                </div>
-                            </div>
-                            <div class="stat-value" id="totalDoctors">0</div>
-                            <div class="stat-change positive">
-                                <i class="fas fa-arrow-up"></i>
-                                <span>+5% from last month</span>
-                            </div>
-                        </div>
-
-                        <div class="stat-card">
-                            <div class="stat-header">
-                                <div class="stat-title">Today's Appointments</div>
-                                <div class="stat-icon appointments">
-                                    <i class="fas fa-calendar-check"></i>
-                                </div>
-                            </div>
-                            <div class="stat-value" id="todayAppointments">0</div>
-                            <div class="stat-change negative">
-                                <i class="fas fa-arrow-down"></i>
-                                <span>-3% from yesterday</span>
-                            </div>
-                        </div>
-
-                        <div class="stat-card">
-                            <div class="stat-header">
-                                <div class="stat-title">Monthly Revenue</div>
-                                <div class="stat-icon revenue">
-                                    <i class="fas fa-rupee-sign"></i>
-                                </div>
-                            </div>
-                            <div class="stat-value" id="monthlyRevenue">₹0</div>
-                            <div class="stat-change positive">
-                                <i class="fas fa-arrow-up"></i>
-                                <span>+18% from last month</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Charts Section -->
-                    <div class="charts-section">
-                        <div class="chart-card">
-                            <div class="chart-header">
-                                <div class="chart-title">User Registration Trends</div>
-                                <div class="chart-period">
-                                    <button class="period-btn" data-period="7d">7D</button>
-                                    <button class="period-btn active" data-period="30d">30D</button>
-                                    <button class="period-btn" data-period="90d">90D</button>
-                                </div>
-                            </div>
-                            <canvas id="userTrendsChart" width="400" height="200"></canvas>
-                        </div>
-
-                        <div class="chart-card">
-                            <div class="chart-header">
-                                <div class="chart-title">Specialization Distribution</div>
-                            </div>
-                            <canvas id="specializationChart" width="300" height="300"></canvas>
-                        </div>
-                    </div>
-
-                    <!-- Recent Activity -->
-                    <div class="management-section">
-                        <div class="section-header">
-                            <h3 class="section-title">Recent Activity</h3>
-                            <div class="section-actions">
-                                <button class="btn btn-secondary">
-                                    <i class="fas fa-filter"></i>
-                                    Filter
-                                </button>
-                                <button class="btn btn-primary">
-                                    <i class="fas fa-download"></i>
-                                    Export
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="data-table-container">
-                            <div class="table-header">
-                                <div class="table-title">Recent System Activity</div>
-                                <div class="table-search">
-                                    <input type="text" class="search-input" placeholder="Search activity...">
-                                    <select class="filter-select">
-                                        <option value="all">All Activities</option>
-                                        <option value="user">User Activities</option>
-                                        <option value="doctor">Doctor Activities</option>
-                                        <option value="appointment">Appointments</option>
-                                    </select>
-                                </div>
-                            </div>
-                            
-                            <table class="data-table" id="activityTable">
-                                <thead>
-                                    <tr>
-                                        <th>Time</th>
-                                        <th>User</th>
-                                        <th>Activity</th>
-                                        <th>Status</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="activityTableBody">
-                                    <tr>
-                                        <td colspan="5" class="loading">
-                                            <div class="spinner"></div>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- User Management Section -->
-                <div id="usersSection" class="content-section" style="display: none;">
-                    <div class="management-section">
-                        <div class="section-header">
-                            <h3 class="section-title">User Management</h3>
-                            <div class="section-actions">
-                                <button class="btn btn-secondary">
-                                    <i class="fas fa-filter"></i>
-                                    Filter Users
-                                </button>
-                                <button class="btn btn-secondary">
-                                    <i class="fas fa-download"></i>
-                                    Export CSV
-                                </button>
-                                <button class="btn btn-primary">
-                                    <i class="fas fa-plus"></i>
-                                    Add User
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="data-table-container">
-                            <div class="table-header">
-                                <div class="table-title">All Registered Users</div>
-                                <div class="table-search">
-                                    <input type="text" class="search-input" placeholder="Search users..." id="userSearch">
-                                    <select class="filter-select" id="userStatusFilter">
-                                        <option value="all">All Status</option>
-                                        <option value="active">Active</option>
-                                        <option value="inactive">Inactive</option>
-                                        <option value="pending">Pending Verification</option>
-                                    </select>
-                                </div>
-                            </div>
-                            
-                            <table class="data-table">
-                                <thead>
-                                    <tr>
-                                        <th>Name</th>
-                                        <th>Email/Phone</th>
-                                        <th>Registration Date</th>
-                                        <th>Last Login</th>
-                                        <th>Status</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="usersTableBody">
-                                    <tr>
-                                        <td colspan="6" class="loading">
-                                            <div class="spinner"></div>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Doctor Management Section -->
-                <div id="doctorsSection" class="content-section" style="display: none;">
-                    <div class="management-section">
-                        <div class="section-header">
-                            <h3 class="section-title">Doctor Management</h3>
-                            <div class="section-actions">
-                                <button class="btn btn-secondary">
-                                    <i class="fas fa-clock"></i>
-                                    Pending Verifications
-                                    <span class="notification-badge" id="pendingDoctors">0</span>
-                                </button>
-                                <button class="btn btn-secondary">
-                                    <i class="fas fa-download"></i>
-                                    Export Report
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="data-table-container">
-                            <div class="table-header">
-                                <div class="table-title">All Doctors</div>
-                                <div class="table-search">
-                                    <input type="text" class="search-input" placeholder="Search doctors..." id="doctorSearch">
-                                    <select class="filter-select" id="doctorStatusFilter">
-                                        <option value="all">All Status</option>
-                                        <option value="verified">Verified</option>
-                                        <option value="pending">Pending Verification</option>
-                                        <option value="suspended">Suspended</option>
-                                    </select>
-                                    <select class="filter-select" id="specializationFilter">
-                                        <option value="all">All Specializations</option>
-                                        <option value="general">General Medicine</option>
-                                        <option value="pediatrics">Pediatrics</option>
-                                        <option value="cardiology">Cardiology</option>
-                                    </select>
-                                </div>
-                            </div>
-                            
-                            <table class="data-table">
-                                <thead>
-                                    <tr>
-                                        <th>Name</th>
-                                        <th>Specialization</th>
-                                        <th>Email/Phone</th>
-                                        <th>License</th>
-                                        <th>Status</th>
-                                        <th>Rating</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="doctorsTableBody">
-                                    <tr>
-                                        <td colspan="7" class="loading">
-                                            <div class="spinner"></div>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Additional sections will be loaded dynamically -->
-                <div id="appointmentsSection" class="content-section" style="display: none;">
-                    <h2>Appointment Management</h2>
-                    <p>Appointment management features will be loaded here...</p>
-                </div>
-
-                <div id="sosSection" class="content-section" style="display: none;">
-                    <h2>SOS Alert Management</h2>
-                    <p>SOS alert management features will be loaded here...</p>
-                </div>
-
-                <div id="communicationsSection" class="content-section" style="display: none;">
-                    <h2>Communication Center</h2>
-                    <p>Communication management features will be loaded here...</p>
-                </div>
-
-                <div id="settingsSection" class="content-section" style="display: none;">
-                    <h2>System Settings</h2>
-                    <p>System configuration features will be loaded here...</p>
-                </div>
-
-                <div id="reportsSection" class="content-section" style="display: none;">
-                    <h2>Reports & Analytics</h2>
-                    <p>Advanced reporting features will be loaded here...</p>
-                </div>
-
-                <div id="analyticsSection" class="content-section" style="display: none;">
-                    <h2>Advanced Analytics</h2>
-                    <p>Detailed analytics and insights will be loaded here...</p>
-                </div>
-            </main>
-        </div>
+            </section>
+        </main>
     </div>
 
-    <!-- Load Scripts -->
+    <!-- Scripts -->
     <script src="assets/js/config.js"></script>
-    <script src="assets/js/auth.js"></script>
-    <script src="assets/js/api.js"></script>
-    <script src="assets/js/admin.js"></script>
     <script>
-        // Enhanced Admin Dashboard JavaScript
+        // Dashboard JavaScript
         class AdminDashboard {
             constructor() {
-                this.currentSection = 'dashboard';
-                this.sidebarCollapsed = false;
                 this.init();
+                this.loadData();
+                this.setupEventListeners();
+                this.initializeCharts();
             }
 
             init() {
-                this.bindEvents();
-                this.loadDashboardData();
-                this.initCharts();
-                this.checkAuthentication();
+                // Initialize dashboard components
+                console.log('Admin Dashboard initialized');
+                this.updateDateTime();
+                setInterval(() => this.updateDateTime(), 60000); // Update every minute
             }
 
-            checkAuthentication() {
-                const token = localStorage.getItem('nabha_auth_token');
-                const userData = localStorage.getItem('nabha_user_data');
-                
-                if (!token || !userData) {
-                    window.location.href = 'admin-login.html';
-                    return;
-                }
-
-                try {
-                    const user = JSON.parse(userData);
-                    if (user.role !== 'admin') {
-                        alert('Access denied. Admin privileges required.');
-                        window.location.href = 'admin-login.html';
-                        return;
-                    }
-                    
-                    // Update profile display
-                    const profileName = document.querySelector('.profile-name');
-                    const profileAvatar = document.querySelector('.profile-avatar');
-                    if (profileName) profileName.textContent = user.name || 'Admin User';
-                    if (profileAvatar) profileAvatar.textContent = (user.name || 'Admin')[0].toUpperCase();
-                } catch (error) {
-                    console.error('Error parsing user data:', error);
-                    window.location.href = 'admin-login.html';
-                }
-            }
-
-            bindEvents() {
-                // Sidebar toggle
-                const sidebarToggle = document.getElementById('sidebarToggle');
-                sidebarToggle?.addEventListener('click', () => this.toggleSidebar());
-
-                // Navigation items
-                document.querySelectorAll('.nav-item').forEach(item => {
-                    item.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        const section = item.dataset.section;
-                        this.switchSection(section);
+            setupEventListeners() {
+                // Refresh button
+                const refreshBtn = document.getElementById('refreshBtn');
+                if (refreshBtn) {
+                    refreshBtn.addEventListener('click', () => {
+                        this.refreshData();
                     });
-                });
+                }
 
-                // Profile dropdown
-                const adminProfile = document.getElementById('adminProfile');
-                adminProfile?.addEventListener('click', () => this.toggleProfileDropdown());
+                // Export button
+                const exportBtn = document.getElementById('exportBtn');
+                if (exportBtn) {
+                    exportBtn.addEventListener('click', () => {
+                        this.exportReport();
+                    });
+                }
 
-                // Logout functionality
-                document.addEventListener('click', (e) => {
-                    if (e.target.textContent === 'Logout' || e.target.closest('.logout-btn')) {
-                        this.logout();
-                    }
-                });
+                // User menu toggle
+                const userMenu = document.getElementById('userMenu');
+                if (userMenu) {
+                    userMenu.addEventListener('click', () => {
+                        // Toggle user menu dropdown
+                        console.log('User menu clicked');
+                    });
+                }
 
-                // Search functionality
-                const userSearch = document.getElementById('userSearch');
-                userSearch?.addEventListener('input', (e) => this.searchUsers(e.target.value));
-
-                const doctorSearch = document.getElementById('doctorSearch');
-                doctorSearch?.addEventListener('input', (e) => this.searchDoctors(e.target.value));
-            }
-
-            toggleSidebar() {
-                const sidebar = document.getElementById('adminSidebar');
-                const main = document.getElementById('adminMain');
-                
-                this.sidebarCollapsed = !this.sidebarCollapsed;
-                
-                if (this.sidebarCollapsed) {
-                    sidebar.classList.add('collapsed');
-                    main.classList.add('expanded');
-                } else {
-                    sidebar.classList.remove('collapsed');
-                    main.classList.remove('expanded');
+                // Notification button
+                const notificationBtn = document.getElementById('notificationBtn');
+                if (notificationBtn) {
+                    notificationBtn.addEventListener('click', () => {
+                        this.showNotifications();
+                    });
                 }
             }
 
-            switchSection(section) {
-                // Update navigation
-                document.querySelectorAll('.nav-item').forEach(item => {
-                    item.classList.remove('active');
-                });
-                document.querySelector(`[data-section="${section}"]`).classList.add('active');
-
-                // Update content
-                document.querySelectorAll('.content-section').forEach(section => {
-                    section.style.display = 'none';
-                });
-                
-                const targetSection = document.getElementById(`${section}Section`);
-                if (targetSection) {
-                    targetSection.style.display = 'block';
-                }
-
-                // Update page title
-                const titles = {
-                    dashboard: 'Dashboard Overview',
-                    users: 'User Management',
-                    doctors: 'Doctor Management',
-                    appointments: 'Appointment Management',
-                    sos: 'SOS Alert Management',
-                    communications: 'Communication Center',
-                    settings: 'System Settings',
-                    reports: 'Reports & Analytics',
-                    analytics: 'Advanced Analytics'
-                };
-                
-                const pageTitle = document.getElementById('pageTitle');
-                if (pageTitle) pageTitle.textContent = titles[section] || 'Dashboard';
-
-                this.currentSection = section;
-                this.loadSectionData(section);
-            }
-
-            async loadDashboardData() {
+            async loadData() {
                 try {
-                    // Load statistics
-                    await this.loadStatistics();
-                    
-                    // Load recent activity
+                    // Load dashboard data
+                    await this.loadOverviewData();
+                    await this.loadSOSAlerts();
                     await this.loadRecentActivity();
-                    
                 } catch (error) {
                     console.error('Error loading dashboard data:', error);
+                    this.showError('Failed to load dashboard data');
                 }
             }
 
-            async loadStatistics() {
+            async loadOverviewData() {
                 try {
-                    const response = await fetch('/api/admin/dashboard', {
-                        headers: {
-                            'Authorization': `Bearer ${localStorage.getItem('nabha_auth_token')}`
-                        }
-                    });
-
-                    if (response.ok) {
-                        const data = await response.json();
-                        this.updateStatistics(data);
-                    }
-                } catch (error) {
-                    console.error('Error loading statistics:', error);
-                    // Fallback to demo data
-                    this.updateStatistics({
+                    // Simulate API call for overview data
+                    const overviewData = {
                         totalPatients: 1247,
                         totalDoctors: 89,
-                        todayConsultations: 156,
-                        monthlyRevenue: 450000
-                    });
+                        totalASHA: 156,
+                        activeSOS: 5
+                    };
+
+                    // Update overview cards with animation
+                    this.animateCounters(overviewData);
+                } catch (error) {
+                    console.error('Error loading overview data:', error);
                 }
             }
 
-            updateStatistics(data) {
-                const elements = {
-                    totalUsers: document.getElementById('totalUsers'),
-                    totalDoctors: document.getElementById('totalDoctors'),
-                    todayAppointments: document.getElementById('todayAppointments'),
-                    monthlyRevenue: document.getElementById('monthlyRevenue')
-                };
+            animateCounters(data) {
+                // Animate counter values
+                Object.keys(data).forEach(key => {
+                    const element = document.getElementById(key);
+                    if (element) {
+                        const target = data[key];
+                        let current = 0;
+                        const increment = target / 50;
+                        const timer = setInterval(() => {
+                            current += increment;
+                            if (current >= target) {
+                                current = target;
+                                clearInterval(timer);
+                            }
+                            element.textContent = Math.floor(current).toLocaleString();
+                        }, 30);
+                    }
+                });
+            }
 
-                if (elements.totalUsers) elements.totalUsers.textContent = data.totalPatients || 0;
-                if (elements.totalDoctors) elements.totalDoctors.textContent = data.totalDoctors || 0;
-                if (elements.todayAppointments) elements.todayAppointments.textContent = data.todayConsultations || 0;
-                if (elements.monthlyRevenue) elements.monthlyRevenue.textContent = `₹${(data.monthlyRevenue || 0).toLocaleString('en-IN')}`;
+            async loadSOSAlerts() {
+                try {
+                    // The SOS alerts are already rendered in HTML
+                    // In a real application, this would fetch from API
+                    const sosCount = document.querySelectorAll('.sos-alert-card').length;
+                    document.getElementById('sosAlertCount').textContent = sosCount;
+                    
+                    // Hide loading spinner
+                    const loading = document.getElementById('sosLoading');
+                    if (loading) {
+                        loading.style.display = 'none';
+                    }
+                } catch (error) {
+                    console.error('Error loading SOS alerts:', error);
+                }
             }
 
             async loadRecentActivity() {
-                // Load recent activity data
-                const tbody = document.getElementById('activityTableBody');
-                if (!tbody) return;
-
-                try {
-                    // Simulate loading recent activities
-                    const activities = [
-                        { time: '10:30 AM', user: 'Dr. Rajesh Kumar', activity: 'Completed consultation', status: 'success' },
-                        { time: '10:15 AM', user: 'Ram Singh', activity: 'Registered new account', status: 'info' },
-                        { time: '09:45 AM', user: 'Dr. Priya Sharma', activity: 'Updated availability', status: 'info' },
-                        { time: '09:30 AM', user: 'System', activity: 'Backup completed', status: 'success' },
-                        { time: '09:00 AM', user: 'Kiran Kaur', activity: 'Cancelled appointment', status: 'warning' }
-                    ];
-
-                    tbody.innerHTML = activities.map(activity => `
-                        <tr>
-                            <td>${activity.time}</td>
-                            <td>${activity.user}</td>
-                            <td>${activity.activity}</td>
-                            <td><span class="status-badge status-${activity.status}">${activity.status}</span></td>
-                            <td>
-                                <div class="table-actions">
-                                    <button class="action-btn view">View</button>
-                                </div>
-                            </td>
-                        </tr>
-                    `).join('');
-                } catch (error) {
-                    tbody.innerHTML = '<tr><td colspan="5">Error loading activity data</td></tr>';
-                }
+                // Recent activity is already rendered in HTML
+                // In a real application, this would fetch from API
+                console.log('Recent activity loaded');
             }
 
-            initCharts() {
-                this.initUserTrendsChart();
-                this.initSpecializationChart();
+            initializeCharts() {
+                this.createConsultationChart();
+                this.createUserChart();
             }
 
-            initUserTrendsChart() {
-                const ctx = document.getElementById('userTrendsChart');
+            createConsultationChart() {
+                const ctx = document.getElementById('consultationChart');
                 if (!ctx) return;
 
                 new Chart(ctx, {
                     type: 'line',
                     data: {
-                        labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
                         datasets: [{
-                            label: 'New Users',
-                            data: [65, 78, 92, 110],
-                            borderColor: '#2563eb',
-                            backgroundColor: 'rgba(37, 99, 235, 0.1)',
-                            tension: 0.4
-                        }, {
-                            label: 'New Doctors',
-                            data: [12, 15, 18, 22],
-                            borderColor: '#16a34a',
-                            backgroundColor: 'rgba(22, 163, 74, 0.1)',
-                            tension: 0.4
+                            label: 'Consultations',
+                            data: [65, 78, 90, 81, 96, 105],
+                            borderColor: '#10b981',
+                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                            tension: 0.4,
+                            fill: true
                         }]
                     },
                     options: {
@@ -1241,35 +1101,43 @@
                         maintainAspectRatio: false,
                         plugins: {
                             legend: {
-                                position: 'top',
+                                display: false
                             }
                         },
                         scales: {
                             y: {
-                                beginAtZero: true
+                                beginAtZero: true,
+                                grid: {
+                                    color: '#f3f4f6'
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    display: false
+                                }
                             }
                         }
                     }
                 });
             }
 
-            initSpecializationChart() {
-                const ctx = document.getElementById('specializationChart');
+            createUserChart() {
+                const ctx = document.getElementById('userChart');
                 if (!ctx) return;
 
                 new Chart(ctx, {
                     type: 'doughnut',
                     data: {
-                        labels: ['General Medicine', 'Pediatrics', 'Cardiology', 'Dermatology', 'Others'],
+                        labels: ['Patients', 'Doctors', 'ASHA Workers', 'Admin'],
                         datasets: [{
-                            data: [35, 25, 20, 12, 8],
+                            data: [1247, 89, 156, 12],
                             backgroundColor: [
-                                '#2563eb',
-                                '#16a34a',
-                                '#d97706',
-                                '#c2185b',
-                                '#6b7280'
-                            ]
+                                '#10b981',
+                                '#3b82f6',
+                                '#f59e0b',
+                                '#8b5cf6'
+                            ],
+                            borderWidth: 0
                         }]
                     },
                     options: {
@@ -1277,191 +1145,163 @@
                         maintainAspectRatio: false,
                         plugins: {
                             legend: {
-                                position: 'bottom'
+                                position: 'bottom',
+                                labels: {
+                                    padding: 20,
+                                    usePointStyle: true
+                                }
                             }
                         }
                     }
                 });
             }
 
-            async loadSectionData(section) {
-                switch (section) {
-                    case 'users':
-                        await this.loadUsers();
-                        break;
-                    case 'doctors':
-                        await this.loadDoctors();
-                        break;
-                    default:
-                        break;
+            refreshData() {
+                // Show loading state
+                this.showRefreshLoader();
+                
+                // Reload data
+                setTimeout(() => {
+                    this.loadData();
+                    this.hideRefreshLoader();
+                    this.showSuccess('Dashboard data refreshed successfully');
+                }, 1500);
+            }
+
+            showRefreshLoader() {
+                const refreshBtn = document.getElementById('refreshBtn');
+                if (refreshBtn) {
+                    refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Refreshing...';
+                    refreshBtn.disabled = true;
                 }
             }
 
-            async loadUsers() {
-                const tbody = document.getElementById('usersTableBody');
-                if (!tbody) return;
-
-                try {
-                    const response = await fetch('/api/admin/users', {
-                        headers: {
-                            'Authorization': `Bearer ${localStorage.getItem('nabha_auth_token')}`
-                        }
-                    });
-
-                    if (response.ok) {
-                        const users = await response.json();
-                        this.displayUsers(users);
-                    } else {
-                        throw new Error('Failed to load users');
-                    }
-                } catch (error) {
-                    console.error('Error loading users:', error);
-                    tbody.innerHTML = '<tr><td colspan="6">Error loading users</td></tr>';
+            hideRefreshLoader() {
+                const refreshBtn = document.getElementById('refreshBtn');
+                if (refreshBtn) {
+                    refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh Data';
+                    refreshBtn.disabled = false;
                 }
             }
 
-            displayUsers(users) {
-                const tbody = document.getElementById('usersTableBody');
-                if (!tbody) return;
-
-                if (!users || users.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="6">No users found</td></tr>';
-                    return;
-                }
-
-                tbody.innerHTML = users.map(user => `
-                    <tr>
-                        <td>${user.name}</td>
-                        <td>
-                            ${user.email || ''}<br>
-                            <small>${user.phone}</small>
-                        </td>
-                        <td>${new Date(user.createdAt).toLocaleDateString()}</td>
-                        <td>${user.lastLogin ? new Date(user.lastLogin).toLocaleDateString() : 'Never'}</td>
-                        <td><span class="status-badge status-${user.isVerified ? 'verified' : 'pending'}">${user.isVerified ? 'Verified' : 'Pending'}</span></td>
-                        <td>
-                            <div class="table-actions">
-                                <button class="action-btn view" onclick="viewUser('${user._id}')">View</button>
-                                <button class="action-btn edit" onclick="editUser('${user._id}')">Edit</button>
-                                <button class="action-btn delete" onclick="deleteUser('${user._id}')">Delete</button>
-                            </div>
-                        </td>
-                    </tr>
-                `).join('');
+            exportReport() {
+                // Simulate report export
+                this.showSuccess('Report export started. You will receive an email when ready.');
             }
 
-            async loadDoctors() {
-                const tbody = document.getElementById('doctorsTableBody');
-                if (!tbody) return;
-
-                try {
-                    const response = await fetch('/api/admin/doctors', {
-                        headers: {
-                            'Authorization': `Bearer ${localStorage.getItem('nabha_auth_token')}`
-                        }
-                    });
-
-                    if (response.ok) {
-                        const doctors = await response.json();
-                        this.displayDoctors(doctors);
-                    } else {
-                        throw new Error('Failed to load doctors');
-                    }
-                } catch (error) {
-                    console.error('Error loading doctors:', error);
-                    tbody.innerHTML = '<tr><td colspan="7">Error loading doctors</td></tr>';
-                }
+            showNotifications() {
+                // Show notification panel
+                alert('Notifications:\n• 3 new SOS alerts\n• 5 pending doctor approvals\n• 2 system updates available');
             }
 
-            displayDoctors(doctors) {
-                const tbody = document.getElementById('doctorsTableBody');
-                if (!tbody) return;
-
-                if (!doctors || doctors.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="7">No doctors found</td></tr>';
-                    return;
-                }
-
-                tbody.innerHTML = doctors.map(doctor => `
-                    <tr>
-                        <td>${doctor.name}</td>
-                        <td>${doctor.specialization || 'Not specified'}</td>
-                        <td>
-                            ${doctor.email || ''}<br>
-                            <small>${doctor.phone}</small>
-                        </td>
-                        <td>${doctor.licenseNumber || 'Not provided'}</td>
-                        <td><span class="status-badge status-${doctor.isVerified ? 'verified' : 'pending'}">${doctor.isVerified ? 'Verified' : 'Pending'}</span></td>
-                        <td>⭐ ${doctor.rating || 'N/A'}</td>
-                        <td>
-                            <div class="table-actions">
-                                <button class="action-btn view" onclick="viewDoctor('${doctor._id}')">View</button>
-                                ${!doctor.isVerified ? `<button class="action-btn edit" onclick="verifyDoctor('${doctor._id}')">Verify</button>` : ''}
-                                <button class="action-btn delete" onclick="suspendDoctor('${doctor._id}')">Suspend</button>
-                            </div>
-                        </td>
-                    </tr>
-                `).join('');
+            updateDateTime() {
+                const now = new Date();
+                const dateTime = now.toLocaleString('en-IN');
+                // Update any date/time elements if present
             }
 
-            searchUsers(query) {
-                // Implement user search functionality
-                console.log('Searching users:', query);
+            showSuccess(message) {
+                // Simple success notification
+                const notification = document.createElement('div');
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: #10b981;
+                    color: white;
+                    padding: 15px 20px;
+                    border-radius: 8px;
+                    z-index: 1000;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                `;
+                notification.textContent = message;
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    notification.remove();
+                }, 3000);
             }
 
-            searchDoctors(query) {
-                // Implement doctor search functionality
-                console.log('Searching doctors:', query);
-            }
-
-            logout() {
-                localStorage.removeItem('nabha_auth_token');
-                localStorage.removeItem('nabha_user_data');
-                localStorage.removeItem('nabha_user_role');
-                window.location.href = 'admin-login.html';
+            showError(message) {
+                // Simple error notification
+                const notification = document.createElement('div');
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: #ef4444;
+                    color: white;
+                    padding: 15px 20px;
+                    border-radius: 8px;
+                    z-index: 1000;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                `;
+                notification.textContent = message;
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    notification.remove();
+                }, 5000);
             }
         }
 
-        // Global functions for table actions
-        window.viewUser = function(userId) {
-            alert(`Viewing user: ${userId}`);
-            // Implement user details modal
-        };
-
-        window.editUser = function(userId) {
-            alert(`Editing user: ${userId}`);
-            // Implement user edit modal
-        };
-
-        window.deleteUser = function(userId) {
-            if (confirm('Are you sure you want to delete this user?')) {
-                // Implement user deletion
-                alert(`Deleting user: ${userId}`);
-            }
-        };
-
-        window.viewDoctor = function(doctorId) {
-            alert(`Viewing doctor: ${doctorId}`);
-            // Implement doctor details modal
-        };
-
-        window.verifyDoctor = function(doctorId) {
-            if (confirm('Are you sure you want to verify this doctor?')) {
-                // Implement doctor verification
-                alert(`Verifying doctor: ${doctorId}`);
-            }
-        };
-
-        window.suspendDoctor = function(doctorId) {
-            if (confirm('Are you sure you want to suspend this doctor?')) {
-                // Implement doctor suspension
-                alert(`Suspending doctor: ${doctorId}`);
-            }
-        };
-
         // Initialize dashboard when DOM is loaded
         document.addEventListener('DOMContentLoaded', () => {
+            // Check authentication before initializing dashboard
+            const token = localStorage.getItem('adminToken');
+            const adminUser = localStorage.getItem('adminUser');
+            
+            if (!token || !adminUser) {
+                console.log('No admin authentication found, redirecting to login...');
+                window.location.href = '/admin';
+                return;
+            }
+            
+            try {
+                const user = JSON.parse(adminUser);
+                if (user.role !== 'admin') {
+                    console.log('User is not admin, redirecting to login...');
+                    localStorage.removeItem('adminToken');
+                    localStorage.removeItem('adminUser');
+                    window.location.href = '/admin';
+                    return;
+                }
+                
+                // Update user display
+                const userAvatar = document.querySelector('.user-avatar');
+                const userName = document.querySelector('.user-menu div div:first-child');
+                if (userAvatar && user.name) {
+                    userAvatar.textContent = user.name.charAt(0).toUpperCase();
+                }
+                if (userName && user.name) {
+                    userName.textContent = user.name;
+                }
+                
+                console.log('✅ Admin authenticated:', user.name);
+            } catch (error) {
+                console.error('Error parsing admin user data:', error);
+                localStorage.removeItem('adminToken');
+                localStorage.removeItem('adminUser');
+                window.location.href = '/admin';
+                return;
+            }
+            
+            // Initialize dashboard
             new AdminDashboard();
+        });
+
+        // Handle logout
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('a[href="/"]')) {
+                if (confirm('Are you sure you want to logout?')) {
+                    // Clear any session data
+                    localStorage.removeItem('adminToken');
+                    localStorage.removeItem('adminUser');
+                    sessionStorage.clear();
+                    window.location.href = '/';
+                }
+                e.preventDefault();
+            }
         });
     </script>
 </body>
