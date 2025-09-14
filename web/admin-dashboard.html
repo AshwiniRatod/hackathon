@@ -1,0 +1,1595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Nabha Telemedicine Management System</title>
+    <link rel="stylesheet" href="assets/css/main.css">
+    <link rel="stylesheet" href="assets/css/dashboard.css">
+    <link rel="stylesheet" href="assets/css/components.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <style>
+        /* Enhanced Admin Dashboard Styles */
+        .admin-dashboard {
+            display: flex;
+            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
+            background: #f8fafc;
+        }
+
+        /* Enhanced Sidebar */
+        .admin-sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, #1e40af 0%, #1e3a8a 100%);
+            color: white;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .admin-sidebar.collapsed {
+            width: 80px;
+        }
+
+        .sidebar-header {
+            padding: 2rem 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            text-align: center;
+        }
+
+        .sidebar-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-subtitle {
+            font-size: 0.875rem;
+            opacity: 0.8;
+        }
+
+        .sidebar-nav {
+            padding: 1rem 0;
+        }
+
+        .nav-section {
+            margin-bottom: 2rem;
+        }
+
+        .nav-section-title {
+            padding: 0 1.5rem;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            opacity: 0.6;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            color: rgba(255,255,255,0.9);
+            text-decoration: none;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .nav-item:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        .nav-item.active {
+            background: rgba(255,255,255,0.15);
+            color: white;
+            border-right: 3px solid #fbbf24;
+        }
+
+        .nav-item i {
+            width: 20px;
+            margin-right: 1rem;
+            font-size: 1.1rem;
+        }
+
+        /* Main Content Area */
+        .admin-main {
+            flex: 1;
+            margin-left: 280px;
+            transition: all 0.3s ease;
+        }
+
+        .admin-main.expanded {
+            margin-left: 80px;
+        }
+
+        /* Enhanced Header */
+        .admin-header {
+            background: white;
+            padding: 1rem 2rem;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .sidebar-toggle {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            color: #6b7280;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .sidebar-toggle:hover {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .header-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .header-notification {
+            position: relative;
+            background: none;
+            border: none;
+            font-size: 1.1rem;
+            color: #6b7280;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .header-notification:hover {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: 0.2rem;
+            right: 0.2rem;
+            background: #ef4444;
+            color: white;
+            font-size: 0.7rem;
+            padding: 0.2rem 0.4rem;
+            border-radius: 50px;
+            min-width: 1.2rem;
+            text-align: center;
+        }
+
+        .admin-profile {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .admin-profile:hover {
+            background: #f3f4f6;
+        }
+
+        .profile-avatar {
+            width: 2rem;
+            height: 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        .profile-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .profile-name {
+            font-weight: 500;
+            color: #111827;
+        }
+
+        .profile-role {
+            font-size: 0.75rem;
+            color: #6b7280;
+        }
+
+        /* Content Area */
+        .dashboard-content {
+            padding: 2rem;
+        }
+
+        /* Statistics Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e5e7eb;
+            transition: all 0.2s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .stat-title {
+            font-size: 0.875rem;
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        .stat-icon {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .stat-icon.users { background: #dbeafe; color: #2563eb; }
+        .stat-icon.doctors { background: #dcfce7; color: #16a34a; }
+        .stat-icon.appointments { background: #fef3c7; color: #d97706; }
+        .stat-icon.revenue { background: #fce7f3; color: #c2185b; }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-change {
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .stat-change.positive { color: #16a34a; }
+        .stat-change.negative { color: #dc2626; }
+
+        /* Charts Section */
+        .charts-section {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .chart-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e5e7eb;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .chart-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .chart-period {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .period-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid #e5e7eb;
+            background: white;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .period-btn.active {
+            background: #2563eb;
+            color: white;
+            border-color: #2563eb;
+        }
+
+        /* Management Sections */
+        .management-section {
+            margin-bottom: 2rem;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .section-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1d4ed8;
+        }
+
+        .btn-secondary {
+            background: #f3f4f6;
+            color: #374151;
+            border: 1px solid #d1d5db;
+        }
+
+        .btn-secondary:hover {
+            background: #e5e7eb;
+        }
+
+        /* Data Tables */
+        .data-table-container {
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e5e7eb;
+            overflow: hidden;
+        }
+
+        .table-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .table-title {
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .table-search {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .search-input {
+            padding: 0.5rem 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            width: 250px;
+        }
+
+        .filter-select {
+            padding: 0.5rem 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            background: white;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th {
+            background: #f9fafb;
+            padding: 1rem 1.5rem;
+            text-align: left;
+            font-weight: 600;
+            color: #374151;
+            font-size: 0.875rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .data-table td {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #f3f4f6;
+            color: #374151;
+        }
+
+        .data-table tr:hover {
+            background: #f9fafb;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .status-active { background: #dcfce7; color: #166534; }
+        .status-inactive { background: #fee2e2; color: #991b1b; }
+        .status-pending { background: #fef3c7; color: #92400e; }
+        .status-verified { background: #dbeafe; color: #1e40af; }
+
+        .table-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .action-btn {
+            padding: 0.25rem 0.5rem;
+            border: none;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: all 0.2s ease;
+        }
+
+        .action-btn.view { background: #dbeafe; color: #1e40af; }
+        .action-btn.edit { background: #fef3c7; color: #92400e; }
+        .action-btn.delete { background: #fee2e2; color: #991b1b; }
+
+        .action-btn:hover {
+            transform: scale(1.05);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .admin-sidebar {
+                transform: translateX(-100%);
+            }
+
+            .admin-sidebar.mobile-open {
+                transform: translateX(0);
+            }
+
+            .admin-main {
+                margin-left: 0;
+            }
+
+            .charts-section {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-content {
+                padding: 1rem;
+            }
+
+            .admin-header {
+                padding: 1rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Loading States */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f4f6;
+            border-top: 4px solid #2563eb;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #6b7280;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-dashboard">
+        <!-- Enhanced Sidebar -->
+        <aside class="admin-sidebar" id="adminSidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">🏥 Nabha</div>
+                <div class="sidebar-subtitle">Telemedicine Admin</div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Overview</div>
+                    <a href="#dashboard" class="nav-item active" data-section="dashboard">
+                        <i class="fas fa-chart-pie"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="#analytics" class="nav-item" data-section="analytics">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Analytics</span>
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Management</div>
+                    <a href="#users" class="nav-item" data-section="users">
+                        <i class="fas fa-users"></i>
+                        <span>User Management</span>
+                    </a>
+                    <a href="#doctors" class="nav-item" data-section="doctors">
+                        <i class="fas fa-user-md"></i>
+                        <span>Doctor Management</span>
+                    </a>
+                    <a href="#appointments" class="nav-item" data-section="appointments">
+                        <i class="fas fa-calendar-check"></i>
+                        <span>Appointments</span>
+                    </a>
+                    <a href="#sos" class="nav-item" data-section="sos">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span>SOS Alerts</span>
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">System</div>
+                    <a href="#communications" class="nav-item" data-section="communications">
+                        <i class="fas fa-envelope"></i>
+                        <span>Communications</span>
+                    </a>
+                    <a href="#settings" class="nav-item" data-section="settings">
+                        <i class="fas fa-cog"></i>
+                        <span>Settings</span>
+                    </a>
+                    <a href="#reports" class="nav-item" data-section="reports">
+                        <i class="fas fa-file-alt"></i>
+                        <span>Reports</span>
+                    </a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="admin-main" id="adminMain">
+            <!-- Enhanced Header -->
+            <header class="admin-header">
+                <div class="header-left">
+                    <button class="sidebar-toggle" id="sidebarToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1 class="header-title" id="pageTitle">Dashboard Overview</h1>
+                </div>
+                
+                <div class="header-right">
+                    <button class="header-notification" id="notificationBtn">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge" id="notificationCount">3</span>
+                    </button>
+                    
+                    <div class="admin-profile" id="adminProfile">
+                        <div class="profile-avatar">A</div>
+                        <div class="profile-info">
+                            <div class="profile-name">Admin User</div>
+                            <div class="profile-role">System Administrator</div>
+                        </div>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content Area -->
+            <main class="dashboard-content" id="mainContent">
+                <!-- Dashboard Section (Default) -->
+                <div id="dashboardSection" class="content-section active">
+                    <!-- Statistics Cards -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <div class="stat-title">Total Users</div>
+                                <div class="stat-icon users">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                            </div>
+                            <div class="stat-value" id="totalUsers">0</div>
+                            <div class="stat-change positive">
+                                <i class="fas fa-arrow-up"></i>
+                                <span>+12% from last month</span>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <div class="stat-title">Active Doctors</div>
+                                <div class="stat-icon doctors">
+                                    <i class="fas fa-user-md"></i>
+                                </div>
+                            </div>
+                            <div class="stat-value" id="totalDoctors">0</div>
+                            <div class="stat-change positive">
+                                <i class="fas fa-arrow-up"></i>
+                                <span>+5% from last month</span>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <div class="stat-title">Today's Appointments</div>
+                                <div class="stat-icon appointments">
+                                    <i class="fas fa-calendar-check"></i>
+                                </div>
+                            </div>
+                            <div class="stat-value" id="todayAppointments">0</div>
+                            <div class="stat-change negative">
+                                <i class="fas fa-arrow-down"></i>
+                                <span>-3% from yesterday</span>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <div class="stat-title">Monthly Revenue</div>
+                                <div class="stat-icon revenue">
+                                    <i class="fas fa-rupee-sign"></i>
+                                </div>
+                            </div>
+                            <div class="stat-value" id="monthlyRevenue">₹0</div>
+                            <div class="stat-change positive">
+                                <i class="fas fa-arrow-up"></i>
+                                <span>+18% from last month</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Charts Section -->
+                    <div class="charts-section">
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <div class="chart-title">User Registration Trends</div>
+                                <div class="chart-period">
+                                    <button class="period-btn" data-period="7d">7D</button>
+                                    <button class="period-btn active" data-period="30d">30D</button>
+                                    <button class="period-btn" data-period="90d">90D</button>
+                                </div>
+                            </div>
+                            <canvas id="userTrendsChart" width="400" height="200"></canvas>
+                        </div>
+
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <div class="chart-title">Specialization Distribution</div>
+                            </div>
+                            <canvas id="specializationChart" width="300" height="300"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Recent Activity -->
+                    <div class="management-section">
+                        <div class="section-header">
+                            <h3 class="section-title">Recent Activity</h3>
+                            <div class="section-actions">
+                                <button class="btn btn-secondary">
+                                    <i class="fas fa-filter"></i>
+                                    Filter
+                                </button>
+                                <button class="btn btn-primary">
+                                    <i class="fas fa-download"></i>
+                                    Export
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="data-table-container">
+                            <div class="table-header">
+                                <div class="table-title">Recent System Activity</div>
+                                <div class="table-search">
+                                    <input type="text" class="search-input" placeholder="Search activity...">
+                                    <select class="filter-select">
+                                        <option value="all">All Activities</option>
+                                        <option value="user">User Activities</option>
+                                        <option value="doctor">Doctor Activities</option>
+                                        <option value="appointment">Appointments</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <table class="data-table" id="activityTable">
+                                <thead>
+                                    <tr>
+                                        <th>Time</th>
+                                        <th>User</th>
+                                        <th>Activity</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="activityTableBody">
+                                    <tr>
+                                        <td colspan="5" class="loading">
+                                            <div class="spinner"></div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- User Management Section -->
+                <div id="usersSection" class="content-section" style="display: none;">
+                    <div class="management-section">
+                        <div class="section-header">
+                            <h3 class="section-title">User Management</h3>
+                            <div class="section-actions">
+                                <button class="btn btn-secondary">
+                                    <i class="fas fa-filter"></i>
+                                    Filter Users
+                                </button>
+                                <button class="btn btn-secondary">
+                                    <i class="fas fa-download"></i>
+                                    Export CSV
+                                </button>
+                                <button class="btn btn-primary">
+                                    <i class="fas fa-plus"></i>
+                                    Add User
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="data-table-container">
+                            <div class="table-header">
+                                <div class="table-title">All Registered Users</div>
+                                <div class="table-search">
+                                    <input type="text" class="search-input" placeholder="Search users..." id="userSearch">
+                                    <select class="filter-select" id="userStatusFilter">
+                                        <option value="all">All Status</option>
+                                        <option value="active">Active</option>
+                                        <option value="inactive">Inactive</option>
+                                        <option value="pending">Pending Verification</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Email/Phone</th>
+                                        <th>Registration Date</th>
+                                        <th>Last Login</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="usersTableBody">
+                                    <tr>
+                                        <td colspan="6" class="loading">
+                                            <div class="spinner"></div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Doctor Management Section -->
+                <div id="doctorsSection" class="content-section" style="display: none;">
+                    <div class="management-section">
+                        <div class="section-header">
+                            <h3 class="section-title">Doctor Management</h3>
+                            <div class="section-actions">
+                                <button class="btn btn-secondary">
+                                    <i class="fas fa-clock"></i>
+                                    Pending Verifications
+                                    <span class="notification-badge" id="pendingDoctors">0</span>
+                                </button>
+                                <button class="btn btn-secondary">
+                                    <i class="fas fa-download"></i>
+                                    Export Report
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="data-table-container">
+                            <div class="table-header">
+                                <div class="table-title">All Doctors</div>
+                                <div class="table-search">
+                                    <input type="text" class="search-input" placeholder="Search doctors..." id="doctorSearch">
+                                    <select class="filter-select" id="doctorStatusFilter">
+                                        <option value="all">All Status</option>
+                                        <option value="verified">Verified</option>
+                                        <option value="pending">Pending Verification</option>
+                                        <option value="suspended">Suspended</option>
+                                    </select>
+                                    <select class="filter-select" id="specializationFilter">
+                                        <option value="all">All Specializations</option>
+                                        <option value="general">General Medicine</option>
+                                        <option value="pediatrics">Pediatrics</option>
+                                        <option value="cardiology">Cardiology</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Specialization</th>
+                                        <th>Email/Phone</th>
+                                        <th>License</th>
+                                        <th>Status</th>
+                                        <th>Rating</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="doctorsTableBody">
+                                    <tr>
+                                        <td colspan="7" class="loading">
+                                            <div class="spinner"></div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Additional sections will be loaded dynamically -->
+                <div id="appointmentsSection" class="content-section" style="display: none;">
+                    <h2>Appointment Management</h2>
+                    <p>Appointment management features will be loaded here...</p>
+                </div>
+
+                <div id="sosSection" class="content-section" style="display: none;">
+                    <h2>SOS Alert Management</h2>
+                    <p>SOS alert management features will be loaded here...</p>
+                </div>
+
+                <div id="communicationsSection" class="content-section" style="display: none;">
+                    <h2>Communication Center</h2>
+                    <p>Communication management features will be loaded here...</p>
+                </div>
+
+                <div id="settingsSection" class="content-section" style="display: none;">
+                    <h2>System Settings</h2>
+                    <p>System configuration features will be loaded here...</p>
+                </div>
+
+                <div id="reportsSection" class="content-section" style="display: none;">
+                    <h2>Reports & Analytics</h2>
+                    <p>Advanced reporting features will be loaded here...</p>
+                </div>
+
+                <div id="analyticsSection" class="content-section" style="display: none;">
+                    <h2>Advanced Analytics</h2>
+                    <p>Detailed analytics and insights will be loaded here...</p>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Load Scripts -->
+    <script src="assets/js/config.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/api.js"></script>
+    <script src="assets/js/admin.js"></script>
+    <script>
+        // Enhanced Admin Dashboard JavaScript
+        class AdminDashboard {
+            constructor() {
+                this.currentSection = 'dashboard';
+                this.sidebarCollapsed = false;
+                this.init();
+            }
+
+            init() {
+                this.bindEvents();
+                this.loadDashboardData();
+                this.initCharts();
+                this.checkAuthentication();
+            }
+
+            checkAuthentication() {
+                const token = localStorage.getItem('nabha_auth_token');
+                const userData = localStorage.getItem('nabha_user_data');
+                
+                if (!token || !userData) {
+                    window.location.href = 'admin-login.html';
+                    return;
+                }
+
+                try {
+                    const user = JSON.parse(userData);
+                    if (user.role !== 'admin') {
+                        alert('Access denied. Admin privileges required.');
+                        window.location.href = 'admin-login.html';
+                        return;
+                    }
+                    
+                    // Update profile display
+                    const profileName = document.querySelector('.profile-name');
+                    const profileAvatar = document.querySelector('.profile-avatar');
+                    if (profileName) profileName.textContent = user.name || 'Admin User';
+                    if (profileAvatar) profileAvatar.textContent = (user.name || 'Admin')[0].toUpperCase();
+                } catch (error) {
+                    console.error('Error parsing user data:', error);
+                    window.location.href = 'admin-login.html';
+                }
+            }
+
+            bindEvents() {
+                // Sidebar toggle
+                const sidebarToggle = document.getElementById('sidebarToggle');
+                sidebarToggle?.addEventListener('click', () => this.toggleSidebar());
+
+                // Navigation items
+                document.querySelectorAll('.nav-item').forEach(item => {
+                    item.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const section = item.dataset.section;
+                        this.switchSection(section);
+                    });
+                });
+
+                // Profile dropdown
+                const adminProfile = document.getElementById('adminProfile');
+                adminProfile?.addEventListener('click', () => this.toggleProfileDropdown());
+
+                // Logout functionality
+                document.addEventListener('click', (e) => {
+                    if (e.target.textContent === 'Logout' || e.target.closest('.logout-btn')) {
+                        this.logout();
+                    }
+                });
+
+                // Search functionality
+                const userSearch = document.getElementById('userSearch');
+                userSearch?.addEventListener('input', (e) => this.searchUsers(e.target.value));
+
+                const doctorSearch = document.getElementById('doctorSearch');
+                doctorSearch?.addEventListener('input', (e) => this.searchDoctors(e.target.value));
+            }
+
+            toggleSidebar() {
+                const sidebar = document.getElementById('adminSidebar');
+                const main = document.getElementById('adminMain');
+                
+                this.sidebarCollapsed = !this.sidebarCollapsed;
+                
+                if (this.sidebarCollapsed) {
+                    sidebar.classList.add('collapsed');
+                    main.classList.add('expanded');
+                } else {
+                    sidebar.classList.remove('collapsed');
+                    main.classList.remove('expanded');
+                }
+            }
+
+            switchSection(section) {
+                // Update navigation
+                document.querySelectorAll('.nav-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                document.querySelector(`[data-section="${section}"]`).classList.add('active');
+
+                // Update content
+                document.querySelectorAll('.content-section').forEach(section => {
+                    section.style.display = 'none';
+                });
+                
+                const targetSection = document.getElementById(`${section}Section`);
+                if (targetSection) {
+                    targetSection.style.display = 'block';
+                }
+
+                // Update page title
+                const titles = {
+                    dashboard: 'Dashboard Overview',
+                    users: 'User Management',
+                    doctors: 'Doctor Management',
+                    appointments: 'Appointment Management',
+                    sos: 'SOS Alert Management',
+                    communications: 'Communication Center',
+                    settings: 'System Settings',
+                    reports: 'Reports & Analytics',
+                    analytics: 'Advanced Analytics'
+                };
+                
+                const pageTitle = document.getElementById('pageTitle');
+                if (pageTitle) pageTitle.textContent = titles[section] || 'Dashboard';
+
+                this.currentSection = section;
+                this.loadSectionData(section);
+            }
+
+            async loadDashboardData() {
+                try {
+                    // Load statistics
+                    await this.loadStatistics();
+                    
+                    // Load recent activity
+                    await this.loadRecentActivity();
+                    
+                } catch (error) {
+                    console.error('Error loading dashboard data:', error);
+                }
+            }
+
+            async loadStatistics() {
+                try {
+                    const response = await fetch('/api/admin/dashboard', {
+                        headers: {
+                            'Authorization': `Bearer ${localStorage.getItem('nabha_auth_token')}`
+                        }
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        this.updateStatistics(data);
+                    }
+                } catch (error) {
+                    console.error('Error loading statistics:', error);
+                    // Fallback to demo data
+                    this.updateStatistics({
+                        totalPatients: 1247,
+                        totalDoctors: 89,
+                        todayConsultations: 156,
+                        monthlyRevenue: 450000
+                    });
+                }
+            }
+
+            updateStatistics(data) {
+                const elements = {
+                    totalUsers: document.getElementById('totalUsers'),
+                    totalDoctors: document.getElementById('totalDoctors'),
+                    todayAppointments: document.getElementById('todayAppointments'),
+                    monthlyRevenue: document.getElementById('monthlyRevenue')
+                };
+
+                if (elements.totalUsers) elements.totalUsers.textContent = data.totalPatients || 0;
+                if (elements.totalDoctors) elements.totalDoctors.textContent = data.totalDoctors || 0;
+                if (elements.todayAppointments) elements.todayAppointments.textContent = data.todayConsultations || 0;
+                if (elements.monthlyRevenue) elements.monthlyRevenue.textContent = `₹${(data.monthlyRevenue || 0).toLocaleString('en-IN')}`;
+            }
+
+            async loadRecentActivity() {
+                // Load recent activity data
+                const tbody = document.getElementById('activityTableBody');
+                if (!tbody) return;
+
+                try {
+                    // Simulate loading recent activities
+                    const activities = [
+                        { time: '10:30 AM', user: 'Dr. Rajesh Kumar', activity: 'Completed consultation', status: 'success' },
+                        { time: '10:15 AM', user: 'Ram Singh', activity: 'Registered new account', status: 'info' },
+                        { time: '09:45 AM', user: 'Dr. Priya Sharma', activity: 'Updated availability', status: 'info' },
+                        { time: '09:30 AM', user: 'System', activity: 'Backup completed', status: 'success' },
+                        { time: '09:00 AM', user: 'Kiran Kaur', activity: 'Cancelled appointment', status: 'warning' }
+                    ];
+
+                    tbody.innerHTML = activities.map(activity => `
+                        <tr>
+                            <td>${activity.time}</td>
+                            <td>${activity.user}</td>
+                            <td>${activity.activity}</td>
+                            <td><span class="status-badge status-${activity.status}">${activity.status}</span></td>
+                            <td>
+                                <div class="table-actions">
+                                    <button class="action-btn view">View</button>
+                                </div>
+                            </td>
+                        </tr>
+                    `).join('');
+                } catch (error) {
+                    tbody.innerHTML = '<tr><td colspan="5">Error loading activity data</td></tr>';
+                }
+            }
+
+            initCharts() {
+                this.initUserTrendsChart();
+                this.initSpecializationChart();
+            }
+
+            initUserTrendsChart() {
+                const ctx = document.getElementById('userTrendsChart');
+                if (!ctx) return;
+
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+                        datasets: [{
+                            label: 'New Users',
+                            data: [65, 78, 92, 110],
+                            borderColor: '#2563eb',
+                            backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                            tension: 0.4
+                        }, {
+                            label: 'New Doctors',
+                            data: [12, 15, 18, 22],
+                            borderColor: '#16a34a',
+                            backgroundColor: 'rgba(22, 163, 74, 0.1)',
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            }
+
+            initSpecializationChart() {
+                const ctx = document.getElementById('specializationChart');
+                if (!ctx) return;
+
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['General Medicine', 'Pediatrics', 'Cardiology', 'Dermatology', 'Others'],
+                        datasets: [{
+                            data: [35, 25, 20, 12, 8],
+                            backgroundColor: [
+                                '#2563eb',
+                                '#16a34a',
+                                '#d97706',
+                                '#c2185b',
+                                '#6b7280'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom'
+                            }
+                        }
+                    }
+                });
+            }
+
+            async loadSectionData(section) {
+                switch (section) {
+                    case 'users':
+                        await this.loadUsers();
+                        break;
+                    case 'doctors':
+                        await this.loadDoctors();
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            async loadUsers() {
+                const tbody = document.getElementById('usersTableBody');
+                if (!tbody) return;
+
+                try {
+                    const response = await fetch('/api/admin/users', {
+                        headers: {
+                            'Authorization': `Bearer ${localStorage.getItem('nabha_auth_token')}`
+                        }
+                    });
+
+                    if (response.ok) {
+                        const users = await response.json();
+                        this.displayUsers(users);
+                    } else {
+                        throw new Error('Failed to load users');
+                    }
+                } catch (error) {
+                    console.error('Error loading users:', error);
+                    tbody.innerHTML = '<tr><td colspan="6">Error loading users</td></tr>';
+                }
+            }
+
+            displayUsers(users) {
+                const tbody = document.getElementById('usersTableBody');
+                if (!tbody) return;
+
+                if (!users || users.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6">No users found</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = users.map(user => `
+                    <tr>
+                        <td>${user.name}</td>
+                        <td>
+                            ${user.email || ''}<br>
+                            <small>${user.phone}</small>
+                        </td>
+                        <td>${new Date(user.createdAt).toLocaleDateString()}</td>
+                        <td>${user.lastLogin ? new Date(user.lastLogin).toLocaleDateString() : 'Never'}</td>
+                        <td><span class="status-badge status-${user.isVerified ? 'verified' : 'pending'}">${user.isVerified ? 'Verified' : 'Pending'}</span></td>
+                        <td>
+                            <div class="table-actions">
+                                <button class="action-btn view" onclick="viewUser('${user._id}')">View</button>
+                                <button class="action-btn edit" onclick="editUser('${user._id}')">Edit</button>
+                                <button class="action-btn delete" onclick="deleteUser('${user._id}')">Delete</button>
+                            </div>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+
+            async loadDoctors() {
+                const tbody = document.getElementById('doctorsTableBody');
+                if (!tbody) return;
+
+                try {
+                    const response = await fetch('/api/admin/doctors', {
+                        headers: {
+                            'Authorization': `Bearer ${localStorage.getItem('nabha_auth_token')}`
+                        }
+                    });
+
+                    if (response.ok) {
+                        const doctors = await response.json();
+                        this.displayDoctors(doctors);
+                    } else {
+                        throw new Error('Failed to load doctors');
+                    }
+                } catch (error) {
+                    console.error('Error loading doctors:', error);
+                    tbody.innerHTML = '<tr><td colspan="7">Error loading doctors</td></tr>';
+                }
+            }
+
+            displayDoctors(doctors) {
+                const tbody = document.getElementById('doctorsTableBody');
+                if (!tbody) return;
+
+                if (!doctors || doctors.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7">No doctors found</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = doctors.map(doctor => `
+                    <tr>
+                        <td>${doctor.name}</td>
+                        <td>${doctor.specialization || 'Not specified'}</td>
+                        <td>
+                            ${doctor.email || ''}<br>
+                            <small>${doctor.phone}</small>
+                        </td>
+                        <td>${doctor.licenseNumber || 'Not provided'}</td>
+                        <td><span class="status-badge status-${doctor.isVerified ? 'verified' : 'pending'}">${doctor.isVerified ? 'Verified' : 'Pending'}</span></td>
+                        <td>⭐ ${doctor.rating || 'N/A'}</td>
+                        <td>
+                            <div class="table-actions">
+                                <button class="action-btn view" onclick="viewDoctor('${doctor._id}')">View</button>
+                                ${!doctor.isVerified ? `<button class="action-btn edit" onclick="verifyDoctor('${doctor._id}')">Verify</button>` : ''}
+                                <button class="action-btn delete" onclick="suspendDoctor('${doctor._id}')">Suspend</button>
+                            </div>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+
+            searchUsers(query) {
+                // Implement user search functionality
+                console.log('Searching users:', query);
+            }
+
+            searchDoctors(query) {
+                // Implement doctor search functionality
+                console.log('Searching doctors:', query);
+            }
+
+            logout() {
+                localStorage.removeItem('nabha_auth_token');
+                localStorage.removeItem('nabha_user_data');
+                localStorage.removeItem('nabha_user_role');
+                window.location.href = 'admin-login.html';
+            }
+        }
+
+        // Global functions for table actions
+        window.viewUser = function(userId) {
+            alert(`Viewing user: ${userId}`);
+            // Implement user details modal
+        };
+
+        window.editUser = function(userId) {
+            alert(`Editing user: ${userId}`);
+            // Implement user edit modal
+        };
+
+        window.deleteUser = function(userId) {
+            if (confirm('Are you sure you want to delete this user?')) {
+                // Implement user deletion
+                alert(`Deleting user: ${userId}`);
+            }
+        };
+
+        window.viewDoctor = function(doctorId) {
+            alert(`Viewing doctor: ${doctorId}`);
+            // Implement doctor details modal
+        };
+
+        window.verifyDoctor = function(doctorId) {
+            if (confirm('Are you sure you want to verify this doctor?')) {
+                // Implement doctor verification
+                alert(`Verifying doctor: ${doctorId}`);
+            }
+        };
+
+        window.suspendDoctor = function(doctorId) {
+            if (confirm('Are you sure you want to suspend this doctor?')) {
+                // Implement doctor suspension
+                alert(`Suspending doctor: ${doctorId}`);
+            }
+        };
+
+        // Initialize dashboard when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            new AdminDashboard();
+        });
+    </script>
+</body>
+</html>
+                        <div class="card-content">
+                            <h3>Total Patients</h3>
+                            <div class="card-number" id="totalPatientsCount">0</div>
+                            <div class="card-trend positive">+12% this month</div>
+                        </div>
+                    </div>
+                    
+                    <div class="overview-card">
+                        <div class="card-icon">👨‍⚕️</div>
+                        <div class="card-content">
+                            <h3>Active Doctors</h3>
+                            <div class="card-number" id="activeDoctorsCount">0</div>
+                            <div class="card-trend positive">+3 new this week</div>
+                        </div>
+                    </div>
+                    
+                    <div class="overview-card">
+                        <div class="card-icon">👩‍⚕️</div>
+                        <div class="card-content">
+                            <h3>ASHA Workers</h3>
+                            <div class="card-number" id="ashaWorkersCount">0</div>
+                            <div class="card-trend positive">Active in field</div>
+                        </div>
+                    </div>
+                    
+                    <div class="overview-card">
+                        <div class="card-icon">📋</div>
+                        <div class="card-content">
+                            <h3>Consultations Today</h3>
+                            <div class="card-number" id="consultationsTodayCount">0</div>
+                            <div class="card-trend neutral">Avg: 45/day</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Analytics Charts -->
+            <section class="analytics-section">
+                <div class="analytics-grid">
+                    <div class="chart-container">
+                        <h3>Patient Registration Trends</h3>
+                        <canvas id="patientTrendsChart"></canvas>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <h3>Consultation Volume</h3>
+                        <canvas id="consultationVolumeChart"></canvas>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <h3>Disease Distribution</h3>
+                        <canvas id="diseaseDistributionChart"></canvas>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <h3>ASHA Worker Performance</h3>
+                        <canvas id="ashaPerformanceChart"></canvas>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- User Management Section -->
+            <section class="user-management-section">
+                <div class="section-header">
+                    <h2>User Management</h2>
+                    <div class="section-actions">
+                        <button class="btn btn-outline" id="filterUsersBtn">Filter</button>
+                        <button class="btn btn-primary" id="addUserBtn">Add User</button>
+                    </div>
+                </div>
+                
+                <div class="user-tabs">
+                    <button class="tab-btn active" data-tab="doctors">Doctors</button>
+                    <button class="tab-btn" data-tab="asha">ASHA Workers</button>
+                    <button class="tab-btn" data-tab="patients">Patients</button>
+                </div>
+                
+                <div class="user-table-container">
+                    <table class="user-table">
+                        <thead id="userTableHead">
+                            <!-- Table headers will be loaded dynamically -->
+                        </thead>
+                        <tbody id="userTableBody">
+                            <!-- User data will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+            
+            <!-- Recent Activity -->
+            <section class="activity-section">
+                <h2>Recent Activity</h2>
+                <div id="recentActivity" class="activity-list">
+                    <!-- Recent activity will be loaded here -->
+                </div>
+            </section>
+        </main>
+    </div>
+    
+    <!-- Include Modals -->
+    <div id="modals"></div>
+
+    <script src="assets/js/config.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/api.js"></script>
+    <script src="assets/js/websocket.js"></script>
+    <script src="assets/js/admin.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Check authentication
+            if (!isAuthenticated() || getUserRole() !== 'admin') {
+                window.location.href = 'admin-login.html';
+                return;
+            }
+            
+            // Load components
+            await loadComponent('header', 'components/header.html');
+            await loadComponent('sidebar', 'components/sidebar.html');
+            await loadComponent('modals', 'components/modals.html');
+            
+            // Initialize dashboard
+            await initializeAdminDashboard();
+        });
+    </script>
+</body>
+</html>

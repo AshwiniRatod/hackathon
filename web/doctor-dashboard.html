@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Dashboard - Nabha Telemedicine</title>
+    <link rel="stylesheet" href="assets/css/main.css">
+    <link rel="stylesheet" href="assets/css/dashboard.css">
+    <link rel="stylesheet" href="assets/css/components.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="dashboard-page">
+    <div class="dashboard-container">
+        <!-- Include Header -->
+        <div id="header"></div>
+        
+        <!-- Include Sidebar -->
+        <div id="sidebar"></div>
+        
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="dashboard-header">
+                <h1>Doctor Dashboard</h1>
+                <div class="dashboard-actions">
+                    <button class="btn btn-outline" id="refreshBtn">
+                        <span>🔄</span> Refresh
+                    </button>
+                    <button class="btn btn-success" id="goOnlineBtn">
+                        <span>🟢</span> Go Online
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Doctor Status -->
+            <section class="doctor-status-section">
+                <div class="status-card">
+                    <div class="status-indicator" id="doctorStatus">🔴</div>
+                    <div class="status-info">
+                        <h3>Status: <span id="statusText">Offline</span></h3>
+                        <p>Available for consultations</p>
+                    </div>
+                    <button class="btn btn-outline" id="toggleStatusBtn">Toggle Status</button>
+                </div>
+            </section>
+            
+            <!-- Patient Queue -->
+            <section class="patient-queue-section">
+                <div class="section-header">
+                    <h2>📋 Patient Queue</h2>
+                    <span class="queue-count" id="queueCount">0 patients waiting</span>
+                </div>
+                <div id="patientQueueContainer" class="patient-queue">
+                    <!-- Patient queue items will be loaded here -->
+                </div>
+            </section>
+            
+            <!-- Quick Stats -->
+            <section class="quick-stats-section">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">👥</div>
+                        <div class="stat-content">
+                            <h3>Patients Today</h3>
+                            <div class="stat-number" id="patientsTodayCount">0</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">⏱️</div>
+                        <div class="stat-content">
+                            <h3>Avg. Consultation</h3>
+                            <div class="stat-number" id="avgConsultationTime">0 min</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">💊</div>
+                        <div class="stat-content">
+                            <h3>Prescriptions</h3>
+                            <div class="stat-number" id="prescriptionsCount">0</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">⭐</div>
+                        <div class="stat-content">
+                            <h3>Rating</h3>
+                            <div class="stat-number" id="doctorRating">4.8</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Recent Patients -->
+            <section class="recent-patients-section">
+                <div class="section-header">
+                    <h2>Recent Patients</h2>
+                    <button class="btn btn-outline" id="viewAllPatientsBtn">View All</button>
+                </div>
+                <div class="patients-table-container">
+                    <table class="patients-table">
+                        <thead>
+                            <tr>
+                                <th>Patient</th>
+                                <th>Age</th>
+                                <th>Last Visit</th>
+                                <th>Condition</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recentPatientsTableBody">
+                            <!-- Recent patients will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+            
+            <!-- ASHA Reports -->
+            <section class="asha-reports-section">
+                <div class="section-header">
+                    <h2>📊 ASHA Worker Reports</h2>
+                    <button class="btn btn-outline" id="viewAllReportsBtn">View All Reports</button>
+                </div>
+                <div id="ashaReportsContainer" class="asha-reports">
+                    <!-- ASHA reports will be loaded here -->
+                </div>
+            </section>
+            
+            <!-- Prescription Tools -->
+            <section class="prescription-section">
+                <div class="section-header">
+                    <h2>💊 Quick Prescription</h2>
+                    <button class="btn btn-primary" id="createPrescriptionBtn">Create New Prescription</button>
+                </div>
+                <div class="prescription-templates">
+                    <h3>Common Templates</h3>
+                    <div class="template-grid">
+                        <button class="template-btn" data-template="common-cold">Common Cold</button>
+                        <button class="template-btn" data-template="fever">Fever</button>
+                        <button class="template-btn" data-template="hypertension">Hypertension</button>
+                        <button class="template-btn" data-template="diabetes">Diabetes</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    
+    <!-- Include Modals -->
+    <div id="modals"></div>
+
+    <script src="assets/js/config.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/api.js"></script>
+    <script src="assets/js/websocket.js"></script>
+    <script src="assets/js/doctor.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Check authentication
+            if (!isAuthenticated() || getUserRole() !== 'doctor') {
+                window.location.href = 'doctor-login.html';
+                return;
+            }
+            
+            // Load components
+            await loadComponent('header', 'components/header.html');
+            await loadComponent('sidebar', 'components/sidebar.html');
+            await loadComponent('modals', 'components/modals.html');
+            
+            // Initialize dashboard
+            await initializeDoctorDashboard();
+        });
+    </script>
+</body>
+</html>

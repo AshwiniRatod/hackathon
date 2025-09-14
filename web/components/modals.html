@@ -1,0 +1,816 @@
+<!-- Modal Components for Nabha Telemedicine -->
+
+<!-- Notifications Modal -->
+<div class="modal-overlay" id="notificationsModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 class="modal-title">Notifications</h3>
+            <button class="modal-close" onclick="closeModal('notificationsModal')">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="notification-filters">
+                <button class="filter-btn active" data-filter="all">All</button>
+                <button class="filter-btn" data-filter="sos">SOS Alerts</button>
+                <button class="filter-btn" data-filter="consultations">Consultations</button>
+                <button class="filter-btn" data-filter="reports">Reports</button>
+            </div>
+            <div id="notificationsList" class="notifications-list">
+                <div class="loading-spinner"></div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" onclick="markAllAsRead()">Mark All as Read</button>
+            <button class="btn btn-primary" onclick="closeModal('notificationsModal')">Close</button>
+        </div>
+    </div>
+</div>
+
+<!-- Settings Modal -->
+<div class="modal-overlay" id="settingsModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 class="modal-title">Settings</h3>
+            <button class="modal-close" onclick="closeModal('settingsModal')">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="settings-section">
+                <h4>Notifications</h4>
+                <div class="setting-item">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="sosNotifications" checked>
+                        <span>SOS Alert Notifications</span>
+                    </label>
+                </div>
+                <div class="setting-item">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="consultationNotifications" checked>
+                        <span>Consultation Notifications</span>
+                    </label>
+                </div>
+                <div class="setting-item">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="desktopNotifications" checked>
+                        <span>Desktop Notifications</span>
+                    </label>
+                </div>
+                <div class="setting-item">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="soundNotifications" checked>
+                        <span>Sound Notifications</span>
+                    </label>
+                </div>
+            </div>
+            
+            <div class="settings-section">
+                <h4>Display</h4>
+                <div class="setting-item">
+                    <label for="language">Language</label>
+                    <select id="language">
+                        <option value="en">English</option>
+                        <option value="hi">Hindi</option>
+                        <option value="pa">Punjabi</option>
+                    </select>
+                </div>
+                <div class="setting-item">
+                    <label for="timezone">Timezone</label>
+                    <select id="timezone">
+                        <option value="Asia/Kolkata">India Standard Time (IST)</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="settings-section">
+                <h4>Privacy</h4>
+                <div class="setting-item">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="dataCollection" checked>
+                        <span>Allow usage data collection for improvements</span>
+                    </label>
+                </div>
+                <div class="setting-item">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="errorReporting" checked>
+                        <span>Automatic error reporting</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" onclick="resetSettings()">Reset to Default</button>
+            <button class="btn btn-primary" onclick="saveSettings()">Save Settings</button>
+        </div>
+    </div>
+</div>
+
+<!-- Help Modal -->
+<div class="modal-overlay" id="helpModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 class="modal-title">Help & Support</h3>
+            <button class="modal-close" onclick="closeModal('helpModal')">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="help-section">
+                <h4>Quick Help</h4>
+                <div class="help-items">
+                    <div class="help-item">
+                        <strong>Dashboard Navigation</strong>
+                        <p>Use the sidebar to navigate between different sections of the application.</p>
+                    </div>
+                    <div class="help-item">
+                        <strong>SOS Alerts</strong>
+                        <p>Emergency alerts appear in real-time. Click "Respond" to acknowledge and take action.</p>
+                    </div>
+                    <div class="help-item">
+                        <strong>Patient Management</strong>
+                        <p>View patient queues, medical histories, and create prescriptions from the patient section.</p>
+                    </div>
+                    <div class="help-item">
+                        <strong>ASHA Reports</strong>
+                        <p>Review field reports submitted by ASHA workers and provide feedback.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="help-section">
+                <h4>Contact Support</h4>
+                <div class="contact-info">
+                    <p><strong>Email:</strong> <a href="mailto:support@nabha-telemedicine.com">support@nabha-telemedicine.com</a></p>
+                    <p><strong>Phone:</strong> <a href="tel:+919876543210">+91 9876543210</a></p>
+                    <p><strong>Hours:</strong> 24/7 Support Available</p>
+                </div>
+            </div>
+            
+            <div class="help-section">
+                <h4>Technical Information</h4>
+                <div class="tech-info">
+                    <p><strong>Version:</strong> 1.0.0</p>
+                    <p><strong>Last Updated:</strong> <span id="lastUpdated">-</span></p>
+                    <p><strong>Browser:</strong> <span id="browserInfo">-</span></p>
+                    <p><strong>Connection:</strong> <span id="connectionInfo">-</span></p>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" onclick="downloadLogs()">Download Logs</button>
+            <button class="btn btn-primary" onclick="closeModal('helpModal')">Close</button>
+        </div>
+    </div>
+</div>
+
+<!-- Prescription Modal -->
+<div class="modal-overlay" id="prescriptionModal">
+    <div class="modal modal-large">
+        <div class="modal-header">
+            <h3 class="modal-title">Create Prescription</h3>
+            <button class="modal-close" onclick="closeModal('prescriptionModal')">×</button>
+        </div>
+        <div class="modal-body">
+            <form id="prescriptionForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="patientSelect">Patient</label>
+                        <select id="patientSelect" required>
+                            <option value="">Select Patient</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="consultationDate">Consultation Date</label>
+                        <input type="date" id="consultationDate" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="diagnosis">Diagnosis</label>
+                    <textarea id="diagnosis" rows="3" placeholder="Enter diagnosis..."></textarea>
+                </div>
+                
+                <div class="medications-section">
+                    <h4>Medications</h4>
+                    <div id="medicationsList">
+                        <div class="medication-item">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Medicine Name</label>
+                                    <input type="text" name="medicineName" placeholder="Medicine name...">
+                                </div>
+                                <div class="form-group">
+                                    <label>Dosage</label>
+                                    <input type="text" name="dosage" placeholder="e.g., 500mg">
+                                </div>
+                                <div class="form-group">
+                                    <label>Frequency</label>
+                                    <select name="frequency">
+                                        <option value="once">Once daily</option>
+                                        <option value="twice">Twice daily</option>
+                                        <option value="thrice">Three times daily</option>
+                                        <option value="four">Four times daily</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Duration</label>
+                                    <input type="text" name="duration" placeholder="e.g., 7 days">
+                                </div>
+                                <button type="button" class="btn btn-sm btn-outline remove-medication" onclick="removeMedication(this)">Remove</button>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-outline" onclick="addMedication()">Add Medication</button>
+                </div>
+                
+                <div class="form-group">
+                    <label for="instructions">Special Instructions</label>
+                    <textarea id="instructions" rows="3" placeholder="Special instructions for the patient..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="followUp">Follow-up Date</label>
+                    <input type="date" id="followUp">
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" onclick="closeModal('prescriptionModal')">Cancel</button>
+            <button class="btn btn-primary" onclick="savePrescription()">Save Prescription</button>
+        </div>
+    </div>
+</div>
+
+<!-- Confirmation Modal -->
+<div class="modal-overlay" id="confirmationModal">
+    <div class="modal modal-small">
+        <div class="modal-header">
+            <h3 class="modal-title" id="confirmationTitle">Confirm Action</h3>
+            <button class="modal-close" onclick="closeModal('confirmationModal')">×</button>
+        </div>
+        <div class="modal-body">
+            <p id="confirmationMessage">Are you sure you want to perform this action?</p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" onclick="closeModal('confirmationModal')">Cancel</button>
+            <button class="btn btn-primary" id="confirmationAction">Confirm</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// Modal management JavaScript
+(function() {
+    
+    // Initialize modals when DOM is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        initializeModals();
+        loadTechnicalInfo();
+    });
+    
+    function initializeModals() {
+        // Setup modal close on overlay click
+        const overlays = document.querySelectorAll('.modal-overlay');
+        overlays.forEach(overlay => {
+            overlay.addEventListener('click', function(e) {
+                if (e.target === overlay) {
+                    closeModal(overlay.id);
+                }
+            });
+        });
+        
+        // Setup notification filters
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                filterBtns.forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                filterNotifications(this.getAttribute('data-filter'));
+            });
+        });
+        
+        // Setup settings form
+        loadSettings();
+    }
+    
+    function loadTechnicalInfo() {
+        // Update technical information in help modal
+        document.getElementById('lastUpdated').textContent = new Date().toLocaleDateString();
+        document.getElementById('browserInfo').textContent = navigator.userAgent.split(' ').slice(-2).join(' ');
+        
+        // Update connection info
+        const updateConnectionInfo = () => {
+            const status = WebSocketModule ? WebSocketModule.getConnectionStatus() : 'disconnected';
+            document.getElementById('connectionInfo').textContent = status.charAt(0).toUpperCase() + status.slice(1);
+        };
+        
+        updateConnectionInfo();
+        setInterval(updateConnectionInfo, 5000);
+    }
+    
+    // Global modal functions
+    window.openModal = function(modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            modal.classList.add('show');
+            
+            // Load modal-specific content
+            if (modalId === 'notificationsModal') {
+                loadNotifications();
+            } else if (modalId === 'prescriptionModal') {
+                loadPatientOptions();
+                setDefaultPrescriptionDate();
+            }
+        }
+    };
+    
+    window.closeModal = function(modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            modal.classList.remove('show');
+        }
+    };
+    
+    // Notifications functions
+    function loadNotifications() {
+        const notificationsList = document.getElementById('notificationsList');
+        notificationsList.innerHTML = '<div class="loading-spinner"></div>';
+        
+        // Simulate loading notifications
+        setTimeout(() => {
+            const notifications = [
+                {
+                    id: 1,
+                    type: 'sos',
+                    title: 'SOS Alert',
+                    message: 'Emergency reported in Village Nabha',
+                    time: '2 minutes ago',
+                    read: false
+                },
+                {
+                    id: 2,
+                    type: 'consultation',
+                    title: 'New Consultation Request',
+                    message: 'Patient Rajesh Kumar requesting consultation',
+                    time: '5 minutes ago',
+                    read: false
+                },
+                {
+                    id: 3,
+                    type: 'report',
+                    title: 'ASHA Report',
+                    message: 'Weekly report from ASHA worker Priya',
+                    time: '1 hour ago',
+                    read: true
+                }
+            ];
+            
+            renderNotifications(notifications);
+        }, 1000);
+    }
+    
+    function renderNotifications(notifications) {
+        const notificationsList = document.getElementById('notificationsList');
+        
+        if (notifications.length === 0) {
+            notificationsList.innerHTML = '<p class="no-notifications">No notifications found.</p>';
+            return;
+        }
+        
+        const notificationsHtml = notifications.map(notification => `
+            <div class="notification-item ${notification.read ? 'read' : 'unread'}">
+                <div class="notification-icon ${notification.type}">
+                    ${getNotificationIcon(notification.type)}
+                </div>
+                <div class="notification-content">
+                    <h4>${notification.title}</h4>
+                    <p>${notification.message}</p>
+                    <span class="notification-time">${notification.time}</span>
+                </div>
+                <div class="notification-actions">
+                    ${!notification.read ? '<button class="btn btn-sm btn-outline" onclick="markAsRead(' + notification.id + ')">Mark as Read</button>' : ''}
+                    <button class="btn btn-sm btn-outline" onclick="deleteNotification(' + notification.id + ')">Delete</button>
+                </div>
+            </div>
+        `).join('');
+        
+        notificationsList.innerHTML = notificationsHtml;
+    }
+    
+    function getNotificationIcon(type) {
+        switch (type) {
+            case 'sos': return '🚨';
+            case 'consultation': return '👨‍⚕️';
+            case 'report': return '📋';
+            default: return '🔔';
+        }
+    }
+    
+    function filterNotifications(filter) {
+        // Implementation for filtering notifications
+        loadNotifications(); // Reload with filter
+    }
+    
+    window.markAsRead = function(notificationId) {
+        // Implementation for marking notification as read
+        console.log('Marking notification as read:', notificationId);
+    };
+    
+    window.deleteNotification = function(notificationId) {
+        // Implementation for deleting notification
+        console.log('Deleting notification:', notificationId);
+    };
+    
+    window.markAllAsRead = function() {
+        // Implementation for marking all notifications as read
+        console.log('Marking all notifications as read');
+    };
+    
+    // Settings functions
+    function loadSettings() {
+        // Load settings from localStorage or API
+        const settings = JSON.parse(localStorage.getItem('nabha_settings') || '{}');
+        
+        // Apply settings to form
+        Object.keys(settings).forEach(key => {
+            const element = document.getElementById(key);
+            if (element) {
+                if (element.type === 'checkbox') {
+                    element.checked = settings[key];
+                } else {
+                    element.value = settings[key];
+                }
+            }
+        });
+    }
+    
+    window.saveSettings = function() {
+        const settings = {};
+        const settingElements = document.querySelectorAll('#settingsModal input, #settingsModal select');
+        
+        settingElements.forEach(element => {
+            if (element.type === 'checkbox') {
+                settings[element.id] = element.checked;
+            } else {
+                settings[element.id] = element.value;
+            }
+        });
+        
+        localStorage.setItem('nabha_settings', JSON.stringify(settings));
+        
+        // Apply settings
+        applySettings(settings);
+        
+        closeModal('settingsModal');
+        ApiUtils.showSuccessToast('Settings saved successfully');
+    };
+    
+    function applySettings(settings) {
+        // Apply notification settings
+        if (settings.desktopNotifications) {
+            requestNotificationPermission();
+        }
+        
+        // Apply other settings as needed
+    }
+    
+    function requestNotificationPermission() {
+        if ('Notification' in window && Notification.permission === 'default') {
+            Notification.requestPermission();
+        }
+    }
+    
+    window.resetSettings = function() {
+        const defaultSettings = {
+            sosNotifications: true,
+            consultationNotifications: true,
+            desktopNotifications: true,
+            soundNotifications: true,
+            language: 'en',
+            timezone: 'Asia/Kolkata',
+            dataCollection: true,
+            errorReporting: true
+        };
+        
+        localStorage.setItem('nabha_settings', JSON.stringify(defaultSettings));
+        loadSettings();
+        
+        ApiUtils.showSuccessToast('Settings reset to default');
+    };
+    
+    // Help functions
+    window.downloadLogs = function() {
+        // Implementation for downloading logs
+        const logs = {
+            timestamp: new Date().toISOString(),
+            userAgent: navigator.userAgent,
+            url: window.location.href,
+            user: AuthModule.getUserData(),
+            settings: JSON.parse(localStorage.getItem('nabha_settings') || '{}')
+        };
+        
+        const blob = new Blob([JSON.stringify(logs, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `nabha-logs-${new Date().toISOString().split('T')[0]}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    };
+    
+    // Prescription functions
+    function loadPatientOptions() {
+        const patientSelect = document.getElementById('patientSelect');
+        patientSelect.innerHTML = '<option value="">Loading patients...</option>';
+        
+        // Load patients from API
+        DoctorApi.getPatientQueue().then(response => {
+            if (response.success && response.data) {
+                const options = response.data.map(patient => 
+                    `<option value="${patient.id}">${patient.name} (${patient.age}y)</option>`
+                ).join('');
+                
+                patientSelect.innerHTML = '<option value="">Select Patient</option>' + options;
+            }
+        });
+    }
+    
+    function setDefaultPrescriptionDate() {
+        document.getElementById('consultationDate').value = new Date().toISOString().split('T')[0];
+    }
+    
+    window.addMedication = function() {
+        const medicationsList = document.getElementById('medicationsList');
+        const newMedication = document.createElement('div');
+        newMedication.className = 'medication-item';
+        newMedication.innerHTML = `
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Medicine Name</label>
+                    <input type="text" name="medicineName" placeholder="Medicine name...">
+                </div>
+                <div class="form-group">
+                    <label>Dosage</label>
+                    <input type="text" name="dosage" placeholder="e.g., 500mg">
+                </div>
+                <div class="form-group">
+                    <label>Frequency</label>
+                    <select name="frequency">
+                        <option value="once">Once daily</option>
+                        <option value="twice">Twice daily</option>
+                        <option value="thrice">Three times daily</option>
+                        <option value="four">Four times daily</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Duration</label>
+                    <input type="text" name="duration" placeholder="e.g., 7 days">
+                </div>
+                <button type="button" class="btn btn-sm btn-outline remove-medication" onclick="removeMedication(this)">Remove</button>
+            </div>
+        `;
+        
+        medicationsList.appendChild(newMedication);
+    };
+    
+    window.removeMedication = function(button) {
+        button.closest('.medication-item').remove();
+    };
+    
+    window.savePrescription = function() {
+        const form = document.getElementById('prescriptionForm');
+        const formData = new FormData(form);
+        
+        // Collect medications
+        const medications = [];
+        const medicationItems = document.querySelectorAll('.medication-item');
+        
+        medicationItems.forEach(item => {
+            const name = item.querySelector('[name="medicineName"]').value;
+            const dosage = item.querySelector('[name="dosage"]').value;
+            const frequency = item.querySelector('[name="frequency"]').value;
+            const duration = item.querySelector('[name="duration"]').value;
+            
+            if (name && dosage) {
+                medications.push({ name, dosage, frequency, duration });
+            }
+        });
+        
+        const prescriptionData = {
+            patientId: formData.get('patientSelect'),
+            consultationDate: formData.get('consultationDate'),
+            diagnosis: formData.get('diagnosis'),
+            medications: medications,
+            instructions: formData.get('instructions'),
+            followUpDate: formData.get('followUp')
+        };
+        
+        // Save prescription via API
+        DoctorApi.createPrescription(prescriptionData).then(response => {
+            if (response.success) {
+                ApiUtils.showSuccessToast('Prescription saved successfully');
+                closeModal('prescriptionModal');
+                form.reset();
+            } else {
+                ApiUtils.showErrorToast(response.error);
+            }
+        });
+    };
+    
+    // Confirmation modal
+    window.showConfirmation = function(title, message, action) {
+        document.getElementById('confirmationTitle').textContent = title;
+        document.getElementById('confirmationMessage').textContent = message;
+        
+        const actionBtn = document.getElementById('confirmationAction');
+        actionBtn.onclick = function() {
+            action();
+            closeModal('confirmationModal');
+        };
+        
+        openModal('confirmationModal');
+    };
+    
+})();
+</script>
+
+<style>
+/* Modal specific styles */
+.modal-large {
+    max-width: 800px;
+}
+
+.modal-small {
+    max-width: 400px;
+}
+
+.notification-filters {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.filter-btn {
+    padding: 6px 12px;
+    border: 1px solid var(--gray-300);
+    background: white;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.filter-btn.active {
+    background: var(--primary-blue);
+    color: white;
+    border-color: var(--primary-blue);
+}
+
+.notifications-list {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.notification-item {
+    display: flex;
+    gap: 12px;
+    padding: 16px;
+    border-bottom: 1px solid var(--gray-100);
+    transition: background-color 0.2s;
+}
+
+.notification-item:hover {
+    background: var(--gray-50);
+}
+
+.notification-item.unread {
+    background: #eff6ff;
+    border-left: 3px solid var(--primary-blue);
+}
+
+.notification-icon {
+    font-size: 20px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--gray-100);
+}
+
+.notification-icon.sos {
+    background: #fecaca;
+}
+
+.notification-icon.consultation {
+    background: #dbeafe;
+}
+
+.notification-icon.report {
+    background: #dcfce7;
+}
+
+.notification-content {
+    flex: 1;
+}
+
+.notification-content h4 {
+    margin: 0 0 4px 0;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.notification-content p {
+    margin: 0 0 4px 0;
+    font-size: 13px;
+    color: var(--gray-600);
+}
+
+.notification-time {
+    font-size: 12px;
+    color: var(--gray-400);
+}
+
+.notification-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.settings-section {
+    margin-bottom: 24px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.settings-section:last-child {
+    border-bottom: none;
+}
+
+.settings-section h4 {
+    margin-bottom: 16px;
+    font-size: 16px;
+    color: var(--gray-800);
+}
+
+.setting-item {
+    margin-bottom: 16px;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.checkbox-label input[type="checkbox"] {
+    width: auto;
+    margin: 0;
+}
+
+.help-items {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.help-item strong {
+    display: block;
+    margin-bottom: 4px;
+    color: var(--gray-800);
+}
+
+.contact-info p {
+    margin-bottom: 8px;
+}
+
+.tech-info p {
+    margin-bottom: 4px;
+    font-size: 14px;
+}
+
+.medications-section {
+    margin: 20px 0;
+    padding: 16px;
+    background: var(--gray-50);
+    border-radius: 8px;
+}
+
+.medication-item {
+    background: white;
+    padding: 16px;
+    border-radius: 6px;
+    margin-bottom: 12px;
+    border: 1px solid var(--gray-200);
+}
+
+.remove-medication {
+    align-self: flex-end;
+}
+
+.no-notifications {
+    text-align: center;
+    padding: 40px;
+    color: var(--gray-500);
+}
+</style>

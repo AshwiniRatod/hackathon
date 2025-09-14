@@ -1,0 +1,531 @@
+<!-- Sidebar Component for Nabha Telemedicine Dashboard -->
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <div class="sidebar-logo">
+            <img src="assets/images/logo.png" alt="Nabha Telemedicine" />
+            <h2 class="sidebar-title">Nabha Telemedicine</h2>
+        </div>
+    </div>
+    
+    <nav class="sidebar-nav">
+        <!-- Admin Navigation -->
+        <div id="adminNav" class="nav-section" style="display: none;">
+            <div class="nav-section-title">Administration</div>
+            
+            <a href="admin-dashboard.html" class="nav-item" data-page="admin-dashboard">
+                <span class="nav-icon">📊</span>
+                <span class="nav-text">Dashboard</span>
+            </a>
+            
+            <a href="#users" class="nav-item" data-page="users">
+                <span class="nav-icon">👥</span>
+                <span class="nav-text">User Management</span>
+            </a>
+            
+            <a href="#doctors" class="nav-item" data-page="doctors">
+                <span class="nav-icon">👨‍⚕️</span>
+                <span class="nav-text">Doctors</span>
+            </a>
+            
+            <a href="#patients" class="nav-item" data-page="patients">
+                <span class="nav-icon">🏥</span>
+                <span class="nav-text">Patients</span>
+            </a>
+            
+            <a href="#asha-workers" class="nav-item" data-page="asha">
+                <span class="nav-icon">👩‍⚕️</span>
+                <span class="nav-text">ASHA Workers</span>
+            </a>
+            
+            <a href="#sos-alerts" class="nav-item" data-page="sos">
+                <span class="nav-icon">🚨</span>
+                <span class="nav-text">SOS Alerts</span>
+                <span class="nav-badge" id="sosAlertBadge" style="display: none;">0</span>
+            </a>
+            
+            <a href="#analytics" class="nav-item" data-page="analytics">
+                <span class="nav-icon">📈</span>
+                <span class="nav-text">Analytics</span>
+            </a>
+            
+            <a href="#system-settings" class="nav-item" data-page="settings">
+                <span class="nav-icon">⚙️</span>
+                <span class="nav-text">System Settings</span>
+            </a>
+        </div>
+        
+        <!-- Doctor Navigation -->
+        <div id="doctorNav" class="nav-section" style="display: none;">
+            <div class="nav-section-title">Medical Practice</div>
+            
+            <a href="doctor-dashboard.html" class="nav-item" data-page="doctor-dashboard">
+                <span class="nav-icon">📋</span>
+                <span class="nav-text">Dashboard</span>
+            </a>
+            
+            <a href="#patient-queue" class="nav-item" data-page="queue">
+                <span class="nav-icon">⏰</span>
+                <span class="nav-text">Patient Queue</span>
+                <span class="nav-badge" id="queueBadge" style="display: none;">0</span>
+            </a>
+            
+            <a href="#consultations" class="nav-item" data-page="consultations">
+                <span class="nav-icon">🩺</span>
+                <span class="nav-text">Consultations</span>
+            </a>
+            
+            <a href="#my-patients" class="nav-item" data-page="my-patients">
+                <span class="nav-icon">👥</span>
+                <span class="nav-text">My Patients</span>
+            </a>
+            
+            <a href="#prescriptions" class="nav-item" data-page="prescriptions">
+                <span class="nav-icon">💊</span>
+                <span class="nav-text">Prescriptions</span>
+            </a>
+            
+            <a href="#asha-reports" class="nav-item" data-page="asha-reports">
+                <span class="nav-icon">📋</span>
+                <span class="nav-text">ASHA Reports</span>
+                <span class="nav-badge" id="ashaReportBadge" style="display: none;">0</span>
+            </a>
+            
+            <a href="#medical-records" class="nav-item" data-page="records">
+                <span class="nav-icon">📄</span>
+                <span class="nav-text">Medical Records</span>
+            </a>
+            
+            <div class="nav-section-title">Tools</div>
+            
+            <a href="#telemedicine" class="nav-item" data-page="telemedicine">
+                <span class="nav-icon">📹</span>
+                <span class="nav-text">Telemedicine</span>
+            </a>
+            
+            <a href="#pharmacy" class="nav-item" data-page="pharmacy">
+                <span class="nav-icon">🏪</span>
+                <span class="nav-text">Pharmacy</span>
+            </a>
+        </div>
+        
+        <!-- Common Navigation -->
+        <div class="nav-section">
+            <div class="nav-section-title">Account</div>
+            
+            <a href="#profile" class="nav-item" data-page="profile">
+                <span class="nav-icon">👤</span>
+                <span class="nav-text">Profile</span>
+            </a>
+            
+            <a href="#notifications" class="nav-item" data-page="notifications">
+                <span class="nav-icon">🔔</span>
+                <span class="nav-text">Notifications</span>
+                <span class="nav-badge" id="notificationsSidebarBadge" style="display: none;">0</span>
+            </a>
+            
+            <button class="nav-item" onclick="openHelpModal()">
+                <span class="nav-icon">❓</span>
+                <span class="nav-text">Help & Support</span>
+            </button>
+            
+            <button class="nav-item" onclick="logoutUser()">
+                <span class="nav-icon">🚪</span>
+                <span class="nav-text">Logout</span>
+            </button>
+        </div>
+    </nav>
+</aside>
+
+<script>
+// Sidebar component JavaScript
+(function() {
+    
+    // Initialize sidebar when DOM is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        initializeSidebar();
+        setupSidebarEventListeners();
+        loadRoleBasedNavigation();
+        setActiveNavItem();
+    });
+    
+    function initializeSidebar() {
+        // Setup navigation event listeners
+        const navItems = document.querySelectorAll('.nav-item[href^="#"]');
+        navItems.forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                handleNavigation(this.getAttribute('href'), this.getAttribute('data-page'));
+            });
+        });
+        
+        // Setup sidebar close on mobile
+        document.addEventListener('click', function(e) {
+            const sidebar = document.getElementById('sidebar');
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            
+            if (window.innerWidth <= 1024 && 
+                sidebar && 
+                !sidebar.contains(e.target) && 
+                !sidebarToggle?.contains(e.target)) {
+                sidebar.classList.remove('show');
+            }
+        });
+    }
+    
+    function setupSidebarEventListeners() {
+        // Listen for WebSocket events to update badges
+        if (window.WebSocketModule) {
+            WebSocketModule.on('sosAlert', function(data) {
+                updateSosAlertBadge();
+            });
+            
+            WebSocketModule.on('patientQueueUpdate', function(data) {
+                updateQueueBadge(data.count);
+            });
+            
+            WebSocketModule.on('ashaReport', function(data) {
+                updateAshaReportBadge();
+            });
+            
+            WebSocketModule.on('notification', function(data) {
+                updateNotificationsBadge();
+            });
+        }
+    }
+    
+    function loadRoleBasedNavigation() {
+        const userRole = AuthModule.getUserRole();
+        const adminNav = document.getElementById('adminNav');
+        const doctorNav = document.getElementById('doctorNav');
+        
+        // Hide all role-specific navigation first
+        if (adminNav) adminNav.style.display = 'none';
+        if (doctorNav) doctorNav.style.display = 'none';
+        
+        // Show navigation based on user role
+        if (userRole === 'admin' && adminNav) {
+            adminNav.style.display = 'block';
+        } else if (userRole === 'doctor' && doctorNav) {
+            doctorNav.style.display = 'block';
+        }
+    }
+    
+    function setActiveNavItem() {
+        // Remove active class from all nav items
+        const navItems = document.querySelectorAll('.nav-item');
+        navItems.forEach(item => item.classList.remove('active'));
+        
+        // Set active based on current page
+        const currentPage = getCurrentPage();
+        const activeItem = document.querySelector(`[data-page="${currentPage}"]`);
+        
+        if (activeItem) {
+            activeItem.classList.add('active');
+        }
+    }
+    
+    function getCurrentPage() {
+        const path = window.location.pathname;
+        const hash = window.location.hash;
+        
+        if (path.includes('admin-dashboard')) return 'admin-dashboard';
+        if (path.includes('doctor-dashboard')) return 'doctor-dashboard';
+        
+        // Handle hash-based navigation
+        if (hash) {
+            const hashPage = hash.substring(1); // Remove #
+            return hashPage;
+        }
+        
+        return 'dashboard';
+    }
+    
+    function handleNavigation(href, page) {
+        // Update active state
+        const navItems = document.querySelectorAll('.nav-item');
+        navItems.forEach(item => item.classList.remove('active'));
+        
+        const clickedItem = document.querySelector(`[data-page="${page}"]`);
+        if (clickedItem) {
+            clickedItem.classList.add('active');
+        }
+        
+        // Handle navigation based on href
+        if (href.startsWith('#')) {
+            // Hash-based navigation - load content dynamically
+            loadPageContent(page);
+            window.location.hash = href;
+        } else {
+            // Full page navigation
+            window.location.href = href;
+        }
+        
+        // Close sidebar on mobile
+        if (window.innerWidth <= 1024) {
+            const sidebar = document.getElementById('sidebar');
+            if (sidebar) {
+                sidebar.classList.remove('show');
+            }
+        }
+    }
+    
+    function loadPageContent(page) {
+        // This function would load page content dynamically
+        // For now, we'll just update the main content area
+        const mainContent = document.querySelector('.main-content');
+        if (mainContent) {
+            // Show loading state
+            mainContent.innerHTML = '<div class="loading-content">Loading...</div>';
+            
+            // Simulate content loading
+            setTimeout(() => {
+                loadPageByType(page);
+            }, 500);
+        }
+    }
+    
+    function loadPageByType(page) {
+        const mainContent = document.querySelector('.main-content');
+        if (!mainContent) return;
+        
+        switch (page) {
+            case 'users':
+                loadUsersPage();
+                break;
+            case 'doctors':
+                loadDoctorsPage();
+                break;
+            case 'patients':
+                loadPatientsPage();
+                break;
+            case 'asha':
+                loadAshaWorkersPage();
+                break;
+            case 'sos':
+                loadSosAlertsPage();
+                break;
+            case 'analytics':
+                loadAnalyticsPage();
+                break;
+            case 'queue':
+                loadPatientQueuePage();
+                break;
+            case 'consultations':
+                loadConsultationsPage();
+                break;
+            case 'prescriptions':
+                loadPrescriptionsPage();
+                break;
+            case 'asha-reports':
+                loadAshaReportsPage();
+                break;
+            case 'profile':
+                loadProfilePage();
+                break;
+            case 'notifications':
+                loadNotificationsPage();
+                break;
+            default:
+                mainContent.innerHTML = '<h2>Page not found</h2><p>The requested page could not be found.</p>';
+        }
+    }
+    
+    // Badge update functions
+    function updateSosAlertBadge() {
+        // Get current SOS alerts count from API
+        EmergencyApi.getSosAlerts('active').then(response => {
+            if (response.success && response.data) {
+                const count = response.data.length;
+                const badge = document.getElementById('sosAlertBadge');
+                if (badge) {
+                    if (count > 0) {
+                        badge.textContent = count;
+                        badge.style.display = 'block';
+                    } else {
+                        badge.style.display = 'none';
+                    }
+                }
+            }
+        });
+    }
+    
+    function updateQueueBadge(count) {
+        const badge = document.getElementById('queueBadge');
+        if (badge) {
+            if (count > 0) {
+                badge.textContent = count;
+                badge.style.display = 'block';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+    }
+    
+    function updateAshaReportBadge() {
+        // Get unread ASHA reports count
+        AshaApi.getReports().then(response => {
+            if (response.success && response.data) {
+                const unreadCount = response.data.filter(report => !report.read).length;
+                const badge = document.getElementById('ashaReportBadge');
+                if (badge) {
+                    if (unreadCount > 0) {
+                        badge.textContent = unreadCount;
+                        badge.style.display = 'block';
+                    } else {
+                        badge.style.display = 'none';
+                    }
+                }
+            }
+        });
+    }
+    
+    function updateNotificationsBadge() {
+        // Update notifications badge in sidebar
+        const badge = document.getElementById('notificationsSidebarBadge');
+        const headerBadge = document.getElementById('notificationBadge');
+        
+        if (badge && headerBadge) {
+            badge.textContent = headerBadge.textContent;
+            badge.style.display = headerBadge.style.display;
+        }
+    }
+    
+    // Page loading functions (simplified implementations)
+    function loadUsersPage() {
+        const content = `
+            <h2>User Management</h2>
+            <div class="loading-content">Loading users...</div>
+        `;
+        document.querySelector('.main-content').innerHTML = content;
+    }
+    
+    function loadDoctorsPage() {
+        const content = `
+            <h2>Doctors Management</h2>
+            <div class="loading-content">Loading doctors...</div>
+        `;
+        document.querySelector('.main-content').innerHTML = content;
+    }
+    
+    function loadPatientsPage() {
+        const content = `
+            <h2>Patients Management</h2>
+            <div class="loading-content">Loading patients...</div>
+        `;
+        document.querySelector('.main-content').innerHTML = content;
+    }
+    
+    function loadAshaWorkersPage() {
+        const content = `
+            <h2>ASHA Workers</h2>
+            <div class="loading-content">Loading ASHA workers...</div>
+        `;
+        document.querySelector('.main-content').innerHTML = content;
+    }
+    
+    function loadSosAlertsPage() {
+        const content = `
+            <h2>SOS Alerts</h2>
+            <div class="loading-content">Loading SOS alerts...</div>
+        `;
+        document.querySelector('.main-content').innerHTML = content;
+    }
+    
+    function loadAnalyticsPage() {
+        const content = `
+            <h2>Analytics & Reports</h2>
+            <div class="loading-content">Loading analytics...</div>
+        `;
+        document.querySelector('.main-content').innerHTML = content;
+    }
+    
+    function loadPatientQueuePage() {
+        const content = `
+            <h2>Patient Queue</h2>
+            <div class="loading-content">Loading patient queue...</div>
+        `;
+        document.querySelector('.main-content').innerHTML = content;
+    }
+    
+    function loadConsultationsPage() {
+        const content = `
+            <h2>Consultations</h2>
+            <div class="loading-content">Loading consultations...</div>
+        `;
+        document.querySelector('.main-content').innerHTML = content;
+    }
+    
+    function loadPrescriptionsPage() {
+        const content = `
+            <h2>Prescriptions</h2>
+            <div class="loading-content">Loading prescriptions...</div>
+        `;
+        document.querySelector('.main-content').innerHTML = content;
+    }
+    
+    function loadAshaReportsPage() {
+        const content = `
+            <h2>ASHA Reports</h2>
+            <div class="loading-content">Loading ASHA reports...</div>
+        `;
+        document.querySelector('.main-content').innerHTML = content;
+    }
+    
+    function loadProfilePage() {
+        const content = `
+            <h2>Profile</h2>
+            <div class="loading-content">Loading profile...</div>
+        `;
+        document.querySelector('.main-content').innerHTML = content;
+    }
+    
+    function loadNotificationsPage() {
+        const content = `
+            <h2>Notifications</h2>
+            <div class="loading-content">Loading notifications...</div>
+        `;
+        document.querySelector('.main-content').innerHTML = content;
+    }
+    
+    // Global functions
+    window.openHelpModal = function() {
+        if (window.openModal) {
+            window.openModal('helpModal');
+        }
+    };
+    
+    // Initialize badges on load
+    setTimeout(() => {
+        updateSosAlertBadge();
+        updateAshaReportBadge();
+    }, 1000);
+    
+})();
+</script>
+
+<style>
+/* Sidebar specific styles */
+.loading-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    color: var(--gray-500);
+}
+
+.loading-content::before {
+    content: '';
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--gray-300);
+    border-top: 2px solid var(--primary-blue);
+    border-radius: 50%;
+    margin-right: 10px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+</style>

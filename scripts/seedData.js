@@ -88,7 +88,7 @@ const seedData = async () => {
     const admin = new User({
       phone: '9876543210',
       name: 'Admin User',
-      email: 'admin@nabhatelemedicine.com',
+      email: 'admin@nabha.com',
       role: 'admin',
       password: 'admin123',
       isVerified: true
@@ -101,7 +101,7 @@ const seedData = async () => {
       {
         phone: '9876543211',
         name: 'Dr. Rajesh Kumar',
-        email: 'dr.rajesh@nabhatelemedicine.com',
+        email: 'dr.rajesh@nabha.com',
         role: 'doctor',
         password: 'doctor123',
         specialization: 'General Medicine',
@@ -120,7 +120,7 @@ const seedData = async () => {
       {
         phone: '9876543212',
         name: 'Dr. Priya Sharma',
-        email: 'dr.priya@nabhatelemedicine.com',
+        email: 'dr.priya@nabha.com',
         role: 'doctor',
         password: 'doctor123',
         specialization: 'Pediatrics',
@@ -139,7 +139,7 @@ const seedData = async () => {
       {
         phone: '9876543213',
         name: 'Dr. Amit Singh',
-        email: 'dr.amit@nabhatelemedicine.com',
+        email: 'dr.amit@nabha.com',
         role: 'doctor',
         password: 'doctor123',
         specialization: 'Cardiology',

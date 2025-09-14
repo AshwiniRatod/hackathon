@@ -4,7 +4,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const http = require('http');
-const socketIo = require('socket.io');
+const { Server } = require('socket.io');
 require('dotenv').config();
 
 const app = express();
@@ -21,14 +21,20 @@ const JWT_SECRET = process.env.JWT_SECRET || 'default_secret';
 const getAllowedOrigins = () => {
   const baseOrigins = [
     "http://localhost:3000",
+    "http://localhost:5500",   // Live Server default port
+    "http://localhost:8080",
+    "http://localhost:8081", 
     "http://localhost:19000",
     "http://127.0.0.1:3000",
+    "http://127.0.0.1:5500",   // Live Server with 127.0.0.1
+    "http://127.0.0.1:8080",
+    "http://127.0.0.1:8081",
     "http://127.0.0.1:19000"
   ];
   
   // Add network IPs dynamically
   const networkIPs = ["192.168.1.5", "192.168.1.6", "10.0.0.1"];
-  const ports = [3000, 19000, 8081];
+  const ports = [3000, 5500, 8080, 8081, 19000];
   
   networkIPs.forEach(ip => {
     ports.forEach(port => {
@@ -40,11 +46,11 @@ const getAllowedOrigins = () => {
   return baseOrigins;
 };
 
-// Socket.IO setup for real-time communication
-const io = socketIo(server, {
+// Socket.IO Setup with CORS
+const io = new Server(server, {
   cors: {
     origin: getAllowedOrigins(),
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    methods: ["GET", "POST"],
     credentials: true
   }
 });
@@ -55,17 +61,7 @@ app.set('io', io);
 // Security middleware
 app.use(helmet());
 app.use(cors({
-  origin: [
-    "http://localhost:3000", 
-    "http://localhost:8080", 
-    "http://192.168.1.5:3000",
-    "http://192.168.1.6:3000", 
-    "http://localhost:19000",
-    "http://192.168.1.5:19000",
-    "http://192.168.1.6:19000",
-    "exp://192.168.1.5:19000",
-    "exp://192.168.1.6:19000"
-  ],
+  origin: getAllowedOrigins(), // Use the same function as Socket.IO
   credentials: true
 }));
 
@@ -79,6 +75,38 @@ app.use(limiter);
 // Body parsing middleware
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
+
+// Serve static files for web frontend
+app.use('/web', express.static('web'));
+app.use('/admin', express.static('web'));
+app.use('/doctor', express.static('web'));
+
+// Root route to serve main web interface
+app.get('/', (req, res) => {
+  res.sendFile('web/index.html', { root: __dirname });
+});
+
+// Admin routes
+app.get('/admin', (req, res) => {
+  res.sendFile('web/admin-login.html', { root: __dirname });
+});
+
+app.get('/admin/dashboard', (req, res) => {
+  res.sendFile('web/admin-dashboard.html', { root: __dirname });
+});
+
+// Doctor routes  
+app.get('/doctor', (req, res) => {
+  res.sendFile('web/doctor-login.html', { root: __dirname });
+});
+
+app.get('/doctor/register', (req, res) => {
+  res.sendFile('web/doctor-register.html', { root: __dirname });
+});
+
+app.get('/doctor/dashboard', (req, res) => {
+  res.sendFile('web/doctor-dashboard.html', { root: __dirname });
+});
 
 // MongoDB connection with environment variable
 mongoose.connect(MONGODB_URI, {

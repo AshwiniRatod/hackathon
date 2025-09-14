@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - Nabha Telemedicine</title>
+    <link rel="stylesheet" href="assets/css/main.css">
+    <link rel="stylesheet" href="assets/css/components.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="auth-page">
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <img src="assets/images/logo.png" alt="Nabha Telemedicine" class="auth-logo">
+                <h1>Admin Portal</h1>
+                <p>Sign in to access the administrative dashboard</p>
+            </div>
+            
+            <form id="adminLoginForm" class="auth-form">
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" required 
+                           placeholder="admin@nabha.com" value="admin@nabha.com">
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required 
+                           placeholder="Enter your password" value="admin123">
+                </div>
+                
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" id="remember" name="remember">
+                    <label for="remember">Remember me</label>
+                </div>
+                
+                <button type="submit" class="btn btn-primary btn-full">
+                    <span class="btn-text">Sign In</span>
+                    <span class="btn-loader" style="display: none;">Signing in...</span>
+                </button>
+            </form>
+            
+            <div class="auth-footer">
+                <p>Don't have access? <a href="mailto:support@nabha-telemedicine.com">Contact Support</a></p>
+                <p><a href="index.html">← Back to Home</a></p>
+            </div>
+            
+            <div id="errorMessage" class="error-message" style="display: none;"></div>
+            <div id="successMessage" class="success-message" style="display: none;"></div>
+        </div>
+    </div>
+
+    <script src="assets/js/config.js"></script>
+    <script src="assets/js/backend-connector.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/enhanced-api.js"></script>
+    <script src="assets/js/sih-auth-adapter.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('adminLoginForm');
+            
+            // Add connection status indicator
+            const connectionStatus = document.createElement('div');
+            connectionStatus.id = 'connectionStatus';
+            connectionStatus.className = 'connection-status';
+            connectionStatus.innerHTML = '🔍 Detecting your SIH backend...';
+            document.querySelector('.auth-header').appendChild(connectionStatus);
+            
+            // Listen for backend connection updates
+            setTimeout(() => {
+                const status = document.getElementById('connectionStatus');
+                if (window.BackendConnector && BackendConnector.currentPort) {
+                    status.innerHTML = `✅ Connected to backend on port ${BackendConnector.currentPort}`;
+                    status.className = 'connection-status connected';
+                } else {
+                    status.innerHTML = '❌ Please start your SIH backend in Desktop/sih/telemedicine';
+                    status.className = 'connection-status disconnected';
+                }
+            }, 2000);
+            
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                const remember = document.getElementById('remember').checked;
+                
+                // Show loading state
+                const submitBtn = form.querySelector('button[type="submit"]');
+                const originalText = submitBtn.textContent;
+                submitBtn.textContent = 'Connecting to your backend...';
+                submitBtn.disabled = true;
+                
+                try {
+                    // Ensure backend is connected
+                    if (!window.BackendConnector?.currentPort) {
+                        const connected = await window.BackendConnector.init();
+                        if (!connected) {
+                            throw new Error('Could not connect to your SIH backend. Please ensure it\'s running.');
+                        }
+                    }
+                    
+                    await loginUser('admin', email, password, remember);
+                } catch (error) {
+                    console.error('Login error:', error);
+                    
+                    // Show error message
+                    const errorDiv = document.getElementById('errorMessage');
+                    if (errorDiv) {
+                        errorDiv.textContent = error.message || 'Login failed. Please check your backend connection.';
+                        errorDiv.style.display = 'block';
+                    }
+                    
+                    if (window.ApiUtils) {
+                        ApiUtils.showErrorToast(error.message || 'Login failed');
+                    }
+                } finally {
+                    submitBtn.textContent = originalText;
+                    submitBtn.disabled = false;
+                }
+            });
+        });
+    </script>
+    
+    <style>
+        .connection-status {
+            margin-top: 15px;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            text-align: center;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .connection-status.connected {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+        
+        .connection-status.disconnected {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+        
+        button[type="submit"]:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+    </style>
+</body>
+</html>
