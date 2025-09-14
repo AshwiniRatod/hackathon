@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIH Communication Test - App ↔ Web</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .status-bar {
+            background: #f8f9fa;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #dc3545;
+        }
+        
+        .status-dot.connected { background: #28a745; }
+        
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            min-height: 600px;
+        }
+        
+        .panel {
+            padding: 2rem;
+            border-right: 1px solid #e9ecef;
+        }
+        
+        .panel:last-child { border-right: none; }
+        
+        .panel h3 {
+            margin-bottom: 1rem;
+            color: #333;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 0.5rem;
+        }
+        
+        .test-section {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+        
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 0.5rem 0.5rem 0.5rem 0;
+            transition: background 0.3s;
+        }
+        
+        .btn:hover { background: #5a6fd8; }
+        .btn.emergency { background: #dc3545; }
+        .btn.emergency:hover { background: #c82333; }
+        .btn.success { background: #28a745; }
+        .btn.success:hover { background: #218838; }
+        
+        .message-area {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 1rem;
+            height: 200px;
+            overflow-y: auto;
+            margin: 1rem 0;
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+        
+        .message {
+            margin: 0.5rem 0;
+            padding: 0.5rem;
+            border-radius: 4px;
+        }
+        
+        .message.sent { background: #d4edda; border-left: 4px solid #28a745; }
+        .message.received { background: #d1ecf1; border-left: 4px solid #17a2b8; }
+        .message.error { background: #f8d7da; border-left: 4px solid #dc3545; }
+        
+        input[type="text"] {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            margin: 0.5rem 0;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .stat {
+            text-align: center;
+            background: white;
+            padding: 1rem;
+            border-radius: 6px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏥 SIH Telemedicine Communication Test</h1>
+            <p>Testing Real-time Communication: React Native App ↔ Web Interface</p>
+        </div>
+        
+        <div class="status-bar">
+            <div class="status-indicator">
+                <div class="status-dot" id="backendStatus"></div>
+                <span>Backend Server</span>
+            </div>
+            <div class="status-indicator">
+                <div class="status-dot" id="socketStatus"></div>
+                <span>Socket.IO Connection</span>
+            </div>
+            <div class="status-indicator">
+                <div class="status-dot" id="appStatus"></div>
+                <span>Mobile App Status</span>
+            </div>
+        </div>
+        
+        <div class="content">
+            <!-- Web Admin Panel -->
+            <div class="panel">
+                <h3>🌐 Web Admin Interface (Harshal's)</h3>
+                
+                <div class="test-section">
+                    <h4>Send Messages to Mobile App</h4>
+                    <input type="text" id="webMessage" placeholder="Type message to send to mobile app...">
+                    <button class="btn" onclick="sendToMobile()">Send to App</button>
+                    <button class="btn emergency" onclick="sendEmergencyAlert()">🚨 Emergency Alert</button>
+                </div>
+                
+                <div class="test-section">
+                    <h4>Quick Actions</h4>
+                    <button class="btn" onclick="requestPatientList()">📋 Request Patient List</button>
+                    <button class="btn" onclick="broadcastAnnouncement()">📢 Broadcast to All</button>
+                    <button class="btn success" onclick="respondToHelp()">✅ Respond to Help Request</button>
+                </div>
+                
+                <div class="stats">
+                    <div class="stat">
+                        <div class="stat-value" id="messagesSent">0</div>
+                        <div>Messages Sent</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value" id="messagesReceived">0</div>
+                        <div>Messages Received</div>
+                    </div>
+                </div>
+                
+                <div class="message-area" id="webMessages"></div>
+            </div>
+            
+            <!-- Mobile App Simulation Panel -->
+            <div class="panel">
+                <h3>📱 Mobile App Interface (Yours)</h3>
+                
+                <div class="test-section">
+                    <h4>Send Messages to Web Admin</h4>
+                    <input type="text" id="mobileMessage" placeholder="Type message from mobile app...">
+                    <button class="btn" onclick="sendToWeb()">Send to Web</button>
+                    <button class="btn emergency" onclick="sendHelpRequest()">🆘 Send Help Request</button>
+                </div>
+                
+                <div class="test-section">
+                    <h4>Patient Actions</h4>
+                    <button class="btn" onclick="bookConsultation()">📅 Book Consultation</button>
+                    <button class="btn" onclick="reportSymptoms()">🤒 Report Symptoms</button>
+                    <button class="btn emergency" onclick="activateSOS()">🚨 Activate SOS</button>
+                </div>
+                
+                <div class="stats">
+                    <div class="stat">
+                        <div class="stat-value" id="helpRequests">0</div>
+                        <div>Help Requests</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value" id="notifications">0</div>
+                        <div>Notifications</div>
+                    </div>
+                </div>
+                
+                <div class="message-area" id="mobileMessages"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        // Configuration
+        const API_BASE_URL = 'http://localhost:3000/api';
+        const SOCKET_URL = 'http://localhost:3000';
+        
+        let socket = null;
+        let messagesSent = 0;
+        let messagesReceived = 0;
+        let helpRequests = 0;
+        let notifications = 0;
+        
+        // Initialize connection
+        async function init() {
+            try {
+                // Check backend status
+                const response = await fetch(`${API_BASE_URL}/health`);
+                if (response.ok) {
+                    document.getElementById('backendStatus').classList.add('connected');
+                    initSocket();
+                } else {
+                    addMessage('webMessages', 'Backend server not responding', 'error');
+                }
+            } catch (error) {
+                addMessage('webMessages', 'Backend connection failed', 'error');
+            }
+        }
+        
+        // Initialize Socket.IO
+        function initSocket() {
+            try {
+                socket = io(SOCKET_URL);
+                
+                socket.on('connect', () => {
+                    document.getElementById('socketStatus').classList.add('connected');
+                    document.getElementById('appStatus').classList.add('connected');
+                    addMessage('webMessages', '✅ Socket.IO connected', 'received');
+                    addMessage('mobileMessages', '✅ Connected to backend', 'received');
+                });
+                
+                socket.on('disconnect', () => {
+                    document.getElementById('socketStatus').classList.remove('connected');
+                    addMessage('webMessages', '❌ Socket.IO disconnected', 'error');
+                });
+                
+                // Listen for messages from mobile app
+                socket.on('mobile-to-web', (data) => {
+                    messagesReceived++;
+                    updateStats();
+                    addMessage('webMessages', `📱 App: ${data.message}`, 'received');
+                });
+                
+                // Listen for messages from web admin
+                socket.on('web-to-mobile', (data) => {
+                    notifications++;
+                    updateStats();
+                    addMessage('mobileMessages', `🌐 Admin: ${data.message}`, 'received');
+                });
+                
+                // Listen for help requests
+                socket.on('help-request', (data) => {
+                    messagesReceived++;
+                    updateStats();
+                    addMessage('webMessages', `🆘 HELP REQUEST: ${data.message} (Patient ID: ${data.patientId})`, 'error');
+                });
+                
+                // Listen for emergency alerts
+                socket.on('emergency-alert', (data) => {
+                    notifications++;
+                    updateStats();
+                    addMessage('mobileMessages', `🚨 EMERGENCY: ${data.message}`, 'error');
+                });
+                
+            } catch (error) {
+                addMessage('webMessages', 'Socket.IO initialization failed', 'error');
+            }
+        }
+        
+        // Web Admin Functions
+        function sendToMobile() {
+            const message = document.getElementById('webMessage').value;
+            if (message && socket) {
+                socket.emit('web-to-mobile', {
+                    message: message,
+                    adminId: 'admin123',
+                    timestamp: new Date().toISOString()
+                });
+                messagesSent++;
+                updateStats();
+                addMessage('webMessages', `Sent: ${message}`, 'sent');
+                document.getElementById('webMessage').value = '';
+            }
+        }
+        
+        function sendEmergencyAlert() {
+            if (socket) {
+                const alertMessage = 'EMERGENCY: All medical staff report to emergency stations immediately!';
+                socket.emit('emergency-alert', {
+                    message: alertMessage,
+                    priority: 'critical',
+                    adminId: 'admin123',
+                    timestamp: new Date().toISOString()
+                });
+                messagesSent++;
+                updateStats();
+                addMessage('webMessages', `🚨 Emergency Alert Sent`, 'sent');
+            }
+        }
+        
+        function requestPatientList() {
+            if (socket) {
+                socket.emit('web-to-mobile', {
+                    message: 'Please sync your patient data',
+                    action: 'sync_patients',
+                    adminId: 'admin123'
+                });
+                messagesSent++;
+                updateStats();
+                addMessage('webMessages', 'Requested patient list sync', 'sent');
+            }
+        }
+        
+        function broadcastAnnouncement() {
+            if (socket) {
+                socket.emit('web-to-mobile', {
+                    message: 'System maintenance scheduled for tonight 11 PM - 1 AM',
+                    type: 'announcement',
+                    adminId: 'admin123'
+                });
+                messagesSent++;
+                updateStats();
+                addMessage('webMessages', 'Broadcast announcement sent', 'sent');
+            }
+        }
+        
+        function respondToHelp() {
+            if (socket) {
+                socket.emit('web-to-mobile', {
+                    message: 'Help is on the way! Medical team has been notified.',
+                    type: 'help_response',
+                    adminId: 'admin123'
+                });
+                messagesSent++;
+                updateStats();
+                addMessage('webMessages', 'Help response sent', 'sent');
+            }
+        }
+        
+        // Mobile App Functions
+        function sendToWeb() {
+            const message = document.getElementById('mobileMessage').value;
+            if (message && socket) {
+                socket.emit('mobile-to-web', {
+                    message: message,
+                    patientId: 'patient123',
+                    timestamp: new Date().toISOString()
+                });
+                helpRequests++;
+                updateStats();
+                addMessage('mobileMessages', `Sent: ${message}`, 'sent');
+                document.getElementById('mobileMessage').value = '';
+            }
+        }
+        
+        function sendHelpRequest() {
+            if (socket) {
+                socket.emit('help-request', {
+                    message: 'Patient needs immediate medical assistance!',
+                    patientId: 'patient123',
+                    location: 'Nabha District Hospital',
+                    urgency: 'high',
+                    timestamp: new Date().toISOString()
+                });
+                helpRequests++;
+                updateStats();
+                addMessage('mobileMessages', '🆘 Help request sent to admin', 'sent');
+            }
+        }
+        
+        function bookConsultation() {
+            if (socket) {
+                socket.emit('mobile-to-web', {
+                    message: 'New consultation booking request',
+                    action: 'book_consultation',
+                    patientId: 'patient123',
+                    preferredTime: 'Tomorrow 10 AM'
+                });
+                helpRequests++;
+                updateStats();
+                addMessage('mobileMessages', 'Consultation booking sent', 'sent');
+            }
+        }
+        
+        function reportSymptoms() {
+            if (socket) {
+                socket.emit('mobile-to-web', {
+                    message: 'Patient reporting symptoms: fever, cough, fatigue',
+                    action: 'symptom_report',
+                    patientId: 'patient123',
+                    symptoms: ['fever', 'cough', 'fatigue']
+                });
+                helpRequests++;
+                updateStats();
+                addMessage('mobileMessages', 'Symptoms reported to medical team', 'sent');
+            }
+        }
+        
+        function activateSOS() {
+            if (socket) {
+                socket.emit('help-request', {
+                    message: '🚨 EMERGENCY SOS ACTIVATED - Immediate medical attention required!',
+                    patientId: 'patient123',
+                    location: 'GPS: 30.3753, 76.3963 (Nabha)',
+                    urgency: 'critical',
+                    type: 'SOS',
+                    timestamp: new Date().toISOString()
+                });
+                helpRequests++;
+                updateStats();
+                addMessage('mobileMessages', '🚨 SOS ACTIVATED - Emergency services notified', 'error');
+            }
+        }
+        
+        // Utility Functions
+        function addMessage(containerId, message, type) {
+            const container = document.getElementById(containerId);
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            messageDiv.innerHTML = `<small>${new Date().toLocaleTimeString()}</small><br>${message}`;
+            container.appendChild(messageDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+        
+        function updateStats() {
+            document.getElementById('messagesSent').textContent = messagesSent;
+            document.getElementById('messagesReceived').textContent = messagesReceived;
+            document.getElementById('helpRequests').textContent = helpRequests;
+            document.getElementById('notifications').textContent = notifications;
+        }
+        
+        // Initialize on page load
+        window.addEventListener('load', init);
+        
+        // Handle Enter key for message inputs
+        document.getElementById('webMessage').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendToMobile();
+        });
+        
+        document.getElementById('mobileMessage').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendToWeb();
+        });
+    </script>
+</body>
+</html>

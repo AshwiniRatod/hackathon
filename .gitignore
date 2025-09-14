@@ -1,0 +1,14 @@
+# Environment variables
+.env
+node_modules/
+*.log
+.DS_Store
+.vscode/
+coverage/
+dist/
+build/
+
+# Mobile app specific
+mobile/NabhaApp/.expo/
+mobile/NabhaApp/node_modules/
+mobile/NabhaApp/.env

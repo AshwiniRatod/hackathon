@@ -1,0 +1,371 @@
+{
+  "symptoms": [
+    {
+      "id": 1,
+      "name": "Fever",
+      "nameHi": "बुखार",
+      "namePa": "ਬੁਖਾਰ",
+      "category": "General",
+      "severity": "medium",
+      "emergency": false,
+      "conditions": [
+        {
+          "name": "Common Cold",
+          "probability": 0.3,
+          "severity": "mild"
+        },
+        {
+          "name": "Flu",
+          "probability": 0.25,
+          "severity": "medium"
+        },
+        {
+          "name": "Malaria",
+          "probability": 0.15,
+          "severity": "high"
+        },
+        {
+          "name": "Typhoid",
+          "probability": 0.1,
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Headache",
+      "nameHi": "सिरदर्द",
+      "namePa": "ਸਿਰ ਦਰਦ",
+      "category": "Neurological",
+      "severity": "low",
+      "emergency": false,
+      "conditions": [
+        {
+          "name": "Tension Headache",
+          "probability": 0.4,
+          "severity": "mild"
+        },
+        {
+          "name": "Migraine",
+          "probability": 0.3,
+          "severity": "medium"
+        },
+        {
+          "name": "Sinusitis",
+          "probability": 0.2,
+          "severity": "medium"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Chest Pain",
+      "nameHi": "छाती में दर्द",
+      "namePa": "ਛਾਤੀ ਵਿੱਚ ਦਰਦ",
+      "category": "Cardiovascular",
+      "severity": "high",
+      "emergency": true,
+      "conditions": [
+        {
+          "name": "Heart Attack",
+          "probability": 0.2,
+          "severity": "critical"
+        },
+        {
+          "name": "Angina",
+          "probability": 0.15,
+          "severity": "high"
+        },
+        {
+          "name": "Acid Reflux",
+          "probability": 0.3,
+          "severity": "mild"
+        },
+        {
+          "name": "Muscle Strain",
+          "probability": 0.25,
+          "severity": "mild"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "Difficulty Breathing",
+      "nameHi": "सांस लेने में कठिनाई",
+      "namePa": "ਸਾਹ ਲੈਣ ਵਿੱਚ ਮੁਸ਼ਕਿਲ",
+      "category": "Respiratory",
+      "severity": "high",
+      "emergency": true,
+      "conditions": [
+        {
+          "name": "Asthma Attack",
+          "probability": 0.3,
+          "severity": "high"
+        },
+        {
+          "name": "Pneumonia",
+          "probability": 0.2,
+          "severity": "high"
+        },
+        {
+          "name": "COVID-19",
+          "probability": 0.15,
+          "severity": "medium"
+        },
+        {
+          "name": "Anxiety",
+          "probability": 0.2,
+          "severity": "medium"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "Abdominal Pain",
+      "nameHi": "पेट दर्द",
+      "namePa": "ਪੇਟ ਦਰਦ",
+      "category": "Gastrointestinal",
+      "severity": "medium",
+      "emergency": false,
+      "conditions": [
+        {
+          "name": "Indigestion",
+          "probability": 0.4,
+          "severity": "mild"
+        },
+        {
+          "name": "Appendicitis",
+          "probability": 0.1,
+          "severity": "high"
+        },
+        {
+          "name": "Food Poisoning",
+          "probability": 0.25,
+          "severity": "medium"
+        },
+        {
+          "name": "Gastritis",
+          "probability": 0.2,
+          "severity": "medium"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "name": "Cough",
+      "nameHi": "खांसी",
+      "namePa": "ਖੰਘ",
+      "category": "Respiratory",
+      "severity": "low",
+      "emergency": false,
+      "conditions": [
+        {
+          "name": "Common Cold",
+          "probability": 0.4,
+          "severity": "mild"
+        },
+        {
+          "name": "Bronchitis",
+          "probability": 0.25,
+          "severity": "medium"
+        },
+        {
+          "name": "Allergies",
+          "probability": 0.2,
+          "severity": "mild"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "name": "Nausea",
+      "nameHi": "मतली",
+      "namePa": "ਮਤਲੀ",
+      "category": "Gastrointestinal",
+      "severity": "medium",
+      "emergency": false,
+      "conditions": [
+        {
+          "name": "Food Poisoning",
+          "probability": 0.3,
+          "severity": "medium"
+        },
+        {
+          "name": "Motion Sickness",
+          "probability": 0.25,
+          "severity": "mild"
+        },
+        {
+          "name": "Pregnancy",
+          "probability": 0.2,
+          "severity": "mild"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "name": "Dizziness",
+      "nameHi": "चक्कर आना",
+      "namePa": "ਚੱਕਰ ਆਉਣਾ",
+      "category": "Neurological",
+      "severity": "medium",
+      "emergency": false,
+      "conditions": [
+        {
+          "name": "Low Blood Pressure",
+          "probability": 0.3,
+          "severity": "medium"
+        },
+        {
+          "name": "Dehydration",
+          "probability": 0.25,
+          "severity": "mild"
+        },
+        {
+          "name": "Inner Ear Problem",
+          "probability": 0.2,
+          "severity": "medium"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "name": "Severe Allergic Reaction",
+      "nameHi": "गंभीर एलर्जी प्रतिक्रिया",
+      "namePa": "ਗੰਭੀਰ ਐਲਰਜੀ ਪ੍ਰਤਿਕਰਿਆ",
+      "category": "Allergic",
+      "severity": "critical",
+      "emergency": true,
+      "conditions": [
+        {
+          "name": "Anaphylaxis",
+          "probability": 0.8,
+          "severity": "critical"
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "name": "High Fever (>103°F)",
+      "nameHi": "तेज बुखार (>103°F)",
+      "namePa": "ਤੇਜ਼ ਬੁਖਾਰ (>103°F)",
+      "category": "General",
+      "severity": "high",
+      "emergency": true,
+      "conditions": [
+        {
+          "name": "Serious Infection",
+          "probability": 0.6,
+          "severity": "high"
+        },
+        {
+          "name": "Heat Stroke",
+          "probability": 0.2,
+          "severity": "critical"
+        }
+      ]
+    }
+  ],
+  "ageGroups": [
+    {
+      "id": "child",
+      "label": "Child (0-12 years)",
+      "labelHi": "बच्चा (0-12 वर्ष)",
+      "labelPa": "ਬੱਚਾ (0-12 ਸਾਲ)"
+    },
+    {
+      "id": "teen",
+      "label": "Teenager (13-19 years)",
+      "labelHi": "किशोर (13-19 वर्ष)",
+      "labelPa": "ਕਿਸ਼ੋਰ (13-19 ਸਾਲ)"
+    },
+    {
+      "id": "adult",
+      "label": "Adult (20-59 years)",
+      "labelHi": "वयस्क (20-59 वर्ष)",
+      "labelPa": "ਬਾਲਗ (20-59 ਸਾਲ)"
+    },
+    {
+      "id": "senior",
+      "label": "Senior (60+ years)",
+      "labelHi": "वरिष्ठ (60+ वर्ष)",
+      "labelPa": "ਬਜ਼ੁਰਗ (60+ ਸਾਲ)"
+    }
+  ],
+  "severityLevels": [
+    {
+      "id": "mild",
+      "label": "Mild",
+      "labelHi": "हल्का",
+      "labelPa": "ਹਲਕਾ",
+      "color": "#4CAF50",
+      "icon": "😌"
+    },
+    {
+      "id": "moderate",
+      "label": "Moderate",
+      "labelHi": "मध्यम",
+      "labelPa": "ਮੱਧਮ",
+      "color": "#FF9800",
+      "icon": "😐"
+    },
+    {
+      "id": "severe",
+      "label": "Severe",
+      "labelHi": "गंभीर",
+      "labelPa": "ਗੰਭੀਰ",
+      "color": "#F44336",
+      "icon": "😰"
+    },
+    {
+      "id": "critical",
+      "label": "Critical - Seek Emergency Care",
+      "labelHi": "गंभीर - आपातकालीन सेवा लें",
+      "labelPa": "ਗੰਭੀਰ - ਐਮਰਜੈਂਸੀ ਸੇਵਾ ਲਓ",
+      "color": "#D32F2F",
+      "icon": "🚨"
+    }
+  ],
+  "homeRemedies": {
+    "fever": {
+      "en": [
+        "Drink plenty of fluids",
+        "Rest in a cool room",
+        "Use cool compresses",
+        "Take paracetamol if needed"
+      ],
+      "hi": [
+        "भरपूर तरल पदार्थ पिएं",
+        "ठंडे कमरे में आराम करें",
+        "ठंडी सिकाई करें",
+        "जरूरत पड़ने पर पैरासिटामोल लें"
+      ],
+      "pa": [
+        "ਜ਼ਿਆਦਾ ਤਰਲ ਪਦਾਰਥ ਪੀਓ",
+        "ਠੰਡੇ ਕਮਰੇ ਵਿੱਚ ਆਰਾਮ ਕਰੋ",
+        "ਠੰਡੀ ਸਿਕਾਈ ਕਰੋ",
+        "ਲੋੜ ਪੈਣ 'ਤੇ ਪੈਰਾਸਿਟਾਮੋਲ ਲਓ"
+      ]
+    },
+    "headache": {
+      "en": [
+        "Apply cold or warm compress",
+        "Massage temples gently",
+        "Stay hydrated",
+        "Rest in a dark, quiet room"
+      ],
+      "hi": [
+        "ठंडी या गर्म सिकाई करें",
+        "कनपटी की धीरे से मालिश करें",
+        "हाइड्रेटेड रहें",
+        "अंधेरे, शांत कमरे में आराम करें"
+      ],
+      "pa": [
+        "ਠੰਡੀ ਜਾਂ ਗਰਮ ਸਿਕਾਈ ਕਰੋ",
+        "ਕੰਨਪੱਟੀ ਦੀ ਹੌਲੀ ਮਾਲਿਸ਼ ਕਰੋ",
+        "ਹਾਈਡ੍ਰੇਟੇਡ ਰਹੋ",
+        "ਹਨੇਰੇ, ਸ਼ਾਂਤ ਕਮਰੇ ਵਿੱਚ ਆਰਾਮ ਕਰੋ"
+      ]
+    }
+  }
+}

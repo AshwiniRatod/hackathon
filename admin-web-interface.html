@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nabha Telemedicine Admin</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 1200px;
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .header h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+        .header p { opacity: 0.9; }
+        
+        .content { padding: 2rem; }
+        
+        .login-section {
+            max-width: 400px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+            text-align: left;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #333;
+        }
+        
+        input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 0.75rem;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .btn:hover { background: #5a6fd8; }
+        
+        .dashboard {
+            display: none;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+            border-left: 4px solid #667eea;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .stat-label {
+            color: #666;
+            margin-top: 0.5rem;
+        }
+        
+        .actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        
+        .action-btn {
+            padding: 1rem;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .action-btn:hover { background: #218838; }
+        
+        .message {
+            margin: 1rem 0;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        
+        .logout-btn {
+            background: #dc3545;
+            margin-top: 1rem;
+        }
+        
+        .logout-btn:hover { background: #c82333; }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #28a745;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏥 Nabha Telemedicine</h1>
+            <p>Admin Dashboard</p>
+        </div>
+        
+        <div class="content">
+            <!-- Login Section -->
+            <div id="loginSection" class="login-section">
+                <h3>Admin Login</h3>
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="phone">Phone Number</label>
+                        <input type="tel" id="phone" value="9876543210" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" value="admin123" required>
+                    </div>
+                    <button type="submit" class="btn">Login</button>
+                </form>
+                <div id="loginMessage"></div>
+            </div>
+            
+            <!-- Dashboard Section -->
+            <div id="dashboard" class="dashboard">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalPatients">-</div>
+                        <div class="stat-label">Total Patients</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalDoctors">-</div>
+                        <div class="stat-label">Total Doctors</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalASHAs">-</div>
+                        <div class="stat-label">ASHA Workers</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalPharmacies">-</div>
+                        <div class="stat-label">Pharmacies</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="activeSOSAlerts">-</div>
+                        <div class="stat-label">SOS Alerts</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="pendingReports">-</div>
+                        <div class="stat-label">Pending Reports</div>
+                    </div>
+                </div>
+                
+                <div class="actions">
+                    <button class="action-btn" onclick="testAPI('/api/admin/users')">View All Users</button>
+                    <button class="action-btn" onclick="testAPI('/api/patients')">Patient Records</button>
+                    <button class="action-btn" onclick="testAPI('/api/doctors')">Doctor Management</button>
+                    <button class="action-btn" onclick="testAPI('/api/asha')">ASHA Workers</button>
+                    <button class="action-btn" onclick="testAPI('/api/sos')">SOS Alerts</button>
+                    <button class="action-btn" onclick="testAPI('/api/pharmacy')">Pharmacies</button>
+                </div>
+                
+                <button class="btn logout-btn" onclick="logout()">Logout</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:3000/api';
+        let authToken = null;
+        
+        // Check server status
+        async function checkServerStatus() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/health`);
+                const data = await response.json();
+                console.log('✅ Server is running:', data.message);
+                return true;
+            } catch (error) {
+                console.error('❌ Server not running:', error);
+                showMessage('Server not running. Please start the backend server.', 'error');
+                return false;
+            }
+        }
+        
+        // Login functionality
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (!await checkServerStatus()) return;
+            
+            const phone = document.getElementById('phone').value;
+            const password = document.getElementById('password').value;
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ phone, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.user.role === 'admin') {
+                    authToken = data.token;
+                    showMessage('Login successful! Loading dashboard...', 'success');
+                    
+                    setTimeout(() => {
+                        document.getElementById('loginSection').style.display = 'none';
+                        document.getElementById('dashboard').style.display = 'block';
+                        loadDashboard();
+                    }, 1000);
+                } else {
+                    showMessage(data.message || 'Access denied. Admin privileges required.', 'error');
+                }
+            } catch (error) {
+                showMessage('Connection failed. Check if server is running.', 'error');
+            }
+        });
+        
+        // Load dashboard data
+        async function loadDashboard() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/admin/dashboard`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    document.getElementById('totalPatients').textContent = data.totalPatients;
+                    document.getElementById('totalDoctors').textContent = data.totalDoctors;
+                    document.getElementById('totalASHAs').textContent = data.totalASHAs;
+                    document.getElementById('totalPharmacies').textContent = data.totalPharmacies;
+                    document.getElementById('activeSOSAlerts').textContent = data.activeSOSAlerts;
+                    document.getElementById('pendingReports').textContent = data.pendingReports;
+                    
+                    console.log('✅ Dashboard loaded:', data);
+                }
+            } catch (error) {
+                console.error('Dashboard error:', error);
+            }
+        }
+        
+        // Test API endpoints
+        async function testAPI(endpoint) {
+            try {
+                const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+                
+                const data = await response.json();
+                
+                alert(`API Test: ${endpoint}\n\nStatus: ${response.status}\nResponse: ${JSON.stringify(data, null, 2)}`);
+            } catch (error) {
+                alert(`API Error: ${endpoint}\n\nError: ${error.message}`);
+            }
+        }
+        
+        // Show message
+        function showMessage(message, type) {
+            const messageDiv = document.getElementById('loginMessage');
+            messageDiv.innerHTML = `<div class="message ${type}">${message}</div>`;
+        }
+        
+        // Logout
+        function logout() {
+            authToken = null;
+            document.getElementById('loginSection').style.display = 'block';
+            document.getElementById('dashboard').style.display = 'none';
+            document.getElementById('loginMessage').innerHTML = '';
+        }
+        
+        // Auto-check server on load
+        window.addEventListener('load', checkServerStatus);
+    </script>
+</body>
+</html>
