@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const Doctor = require('../models/Doctor');
 const Admin = require('../models/Admin');
+const Patient = require('../models/Patient');
 const { authenticateToken } = require('../middleware/auth');
 
 const router = express.Router();
@@ -464,6 +465,275 @@ router.put('/change-password', authenticateToken, async (req, res) => {
 // Logout (client-side token removal)
 router.post('/logout', authenticateToken, (req, res) => {
   res.json({ message: 'Logout successful' });
+});
+
+// Patient Registration
+router.post('/patient/register', async (req, res) => {
+  try {
+    const { 
+      phone, 
+      name, 
+      email, 
+      password, 
+      dateOfBirth, 
+      gender, 
+      address, 
+      emergencyContact,
+      bloodType,
+      allergies,
+      chronicConditions,
+      healthMetrics
+    } = req.body;
+
+    // Validate required fields
+    if (!phone || !name || !password || !dateOfBirth || !gender || !address || !emergencyContact) {
+      return res.status(400).json({ 
+        success: false,
+        message: 'All required fields must be provided' 
+      });
+    }
+
+    // Check if patient already exists
+    const existingPatient = await Patient.findOne({ phone });
+    if (existingPatient) {
+      return res.status(400).json({ 
+        success: false,
+        message: 'Patient already exists with this phone number' 
+      });
+    }
+
+    // Check email if provided
+    if (email) {
+      const existingEmailPatient = await Patient.findOne({ email });
+      if (existingEmailPatient) {
+        return res.status(400).json({ 
+          success: false,
+          message: 'Patient already exists with this email' 
+        });
+      }
+    }
+
+    // Create new patient
+    const patient = new Patient({
+      phone,
+      name,
+      email,
+      password,
+      dateOfBirth,
+      gender,
+      address,
+      emergencyContact,
+      bloodType,
+      allergies: allergies || [],
+      chronicConditions: chronicConditions || [],
+      healthMetrics: healthMetrics || {}
+    });
+
+    await patient.save();
+
+    // Generate OTP for verification
+    const otp = patient.generateOTP();
+    await patient.save();
+
+    // Generate access token
+    const token = generateToken(patient._id, 'patient');
+
+    // In production, send OTP via SMS
+    console.log(`OTP for patient ${phone}: ${otp}`);
+
+    res.status(201).json({
+      success: true,
+      message: 'Patient registered successfully. Please verify with OTP.',
+      token, // Access token provided immediately
+      patientId: patient._id,
+      patient: {
+        id: patient._id,
+        name: patient.name,
+        phone: patient.phone,
+        email: patient.email,
+        isVerified: patient.isVerified
+      },
+      otp: process.env.NODE_ENV === 'development' ? otp : undefined
+    });
+  } catch (error) {
+    console.error('Patient registration error:', error);
+    res.status(500).json({ 
+      success: false,
+      message: 'Patient registration failed', 
+      error: error.message 
+    });
+  }
+});
+
+// Patient Login
+router.post('/patient/login', async (req, res) => {
+  try {
+    const { phone, email, password } = req.body;
+
+    if (!password || (!phone && !email)) {
+      return res.status(400).json({ 
+        success: false,
+        message: 'Password and either phone or email are required' 
+      });
+    }
+
+    // Find patient by phone or email
+    let patient;
+    if (email) {
+      patient = await Patient.findOne({ email: email.toLowerCase() });
+    } else {
+      patient = await Patient.findOne({ phone });
+    }
+
+    if (!patient) {
+      return res.status(401).json({ 
+        success: false,
+        message: 'Invalid credentials' 
+      });
+    }
+
+    // Verify password
+    const isPasswordValid = await patient.comparePassword(password);
+    if (!isPasswordValid) {
+      return res.status(401).json({ 
+        success: false,
+        message: 'Invalid credentials' 
+      });
+    }
+
+    // Check if patient account is active
+    if (!patient.isActive) {
+      return res.status(401).json({ 
+        success: false,
+        message: 'Patient account is deactivated' 
+      });
+    }
+
+    // Update last login
+    patient.lastLogin = new Date();
+    await patient.save();
+
+    // Generate access token
+    const token = generateToken(patient._id, 'patient');
+
+    res.json({
+      success: true,
+      message: 'Login successful',
+      token,
+      patient: {
+        id: patient._id,
+        name: patient.name,
+        phone: patient.phone,
+        email: patient.email,
+        isVerified: patient.isVerified,
+        language: patient.language,
+        dateOfBirth: patient.dateOfBirth,
+        gender: patient.gender,
+        address: patient.address,
+        emergencyContact: patient.emergencyContact,
+        healthMetrics: patient.healthMetrics
+      }
+    });
+  } catch (error) {
+    console.error('Patient login error:', error);
+    res.status(500).json({ 
+      success: false,
+      message: 'Login failed', 
+      error: error.message 
+    });
+  }
+});
+
+// Patient OTP Verification
+router.post('/patient/verify-otp', async (req, res) => {
+  try {
+    const { phone, otp } = req.body;
+
+    const patient = await Patient.findOne({ phone });
+    if (!patient) {
+      return res.status(404).json({ 
+        success: false,
+        message: 'Patient not found' 
+      });
+    }
+
+    if (patient.isVerified) {
+      return res.status(400).json({ 
+        success: false,
+        message: 'Patient already verified' 
+      });
+    }
+
+    if (!patient.verifyOTP(otp)) {
+      return res.status(400).json({ 
+        success: false,
+        message: 'Invalid or expired OTP' 
+      });
+    }
+
+    patient.isVerified = true;
+    patient.otp = undefined;
+    await patient.save();
+
+    res.json({
+      success: true,
+      message: 'OTP verified successfully',
+      patient: {
+        id: patient._id,
+        name: patient.name,
+        phone: patient.phone,
+        isVerified: patient.isVerified
+      }
+    });
+  } catch (error) {
+    console.error('Patient OTP verification error:', error);
+    res.status(500).json({ 
+      success: false,
+      message: 'OTP verification failed', 
+      error: error.message 
+    });
+  }
+});
+
+// Patient Resend OTP
+router.post('/patient/resend-otp', async (req, res) => {
+  try {
+    const { phone } = req.body;
+
+    const patient = await Patient.findOne({ phone });
+    if (!patient) {
+      return res.status(404).json({ 
+        success: false,
+        message: 'Patient not found' 
+      });
+    }
+
+    if (patient.isVerified) {
+      return res.status(400).json({ 
+        success: false,
+        message: 'Patient already verified' 
+      });
+    }
+
+    const otp = patient.generateOTP();
+    await patient.save();
+
+    // In production, send OTP via SMS
+    console.log(`OTP for patient ${phone}: ${otp}`);
+
+    res.json({
+      success: true,
+      message: 'OTP sent successfully',
+      otp: process.env.NODE_ENV === 'development' ? otp : undefined
+    });
+  } catch (error) {
+    console.error('Patient resend OTP error:', error);
+    res.status(500).json({ 
+      success: false,
+      message: 'Failed to resend OTP', 
+      error: error.message 
+    });
+  }
 });
 
 module.exports = router;

@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const Doctor = require('../models/Doctor');
 const Admin = require('../models/Admin');
+const Patient = require('../models/Patient');
 
 // Verify JWT token
 const authenticateToken = async (req, res, next) => {
@@ -28,6 +29,11 @@ const authenticateToken = async (req, res, next) => {
       user = await Admin.findById(userId).select('-password');
       if (user) {
         user = { ...user.toObject(), role: 'admin' };
+      }
+    } else if (userType === 'patient') {
+      user = await Patient.findById(userId).select('-password');
+      if (user) {
+        user = { ...user.toObject(), role: 'patient' };
       }
     } else {
       user = await User.findById(userId).select('-password');
@@ -83,6 +89,11 @@ const optionalAuth = async (req, res, next) => {
         user = await Admin.findById(userId).select('-password');
         if (user) {
           user = { ...user.toObject(), role: 'admin' };
+        }
+      } else if (userType === 'patient') {
+        user = await Patient.findById(userId).select('-password');
+        if (user) {
+          user = { ...user.toObject(), role: 'patient' };
         }
       } else {
         user = await User.findById(userId).select('-password');
