@@ -1,5 +1,7 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const Doctor = require('../models/Doctor');
+const Admin = require('../models/Admin');
 
 // Verify JWT token
 const authenticateToken = async (req, res, next) => {
@@ -12,7 +14,24 @@ const authenticateToken = async (req, res, next) => {
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findById(decoded.userId).select('-password');
+    const { userId, userType = 'user' } = decoded;
+    
+    let user;
+    
+    // Find user based on userType
+    if (userType === 'doctor') {
+      user = await Doctor.findById(userId).select('-password');
+      if (user) {
+        user = { ...user.toObject(), role: 'doctor' };
+      }
+    } else if (userType === 'admin') {
+      user = await Admin.findById(userId).select('-password');
+      if (user) {
+        user = { ...user.toObject(), role: 'admin' };
+      }
+    } else {
+      user = await User.findById(userId).select('-password');
+    }
     
     if (!user || !user.isActive) {
       return res.status(401).json({ message: 'Invalid or inactive user' });
@@ -50,21 +69,36 @@ const optionalAuth = async (req, res, next) => {
 
     if (token) {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      const user = await User.findById(decoded.userId).select('-password');
+      const { userId, userType = 'user' } = decoded;
+      
+      let user;
+      
+      // Find user based on userType
+      if (userType === 'doctor') {
+        user = await Doctor.findById(userId).select('-password');
+        if (user) {
+          user = { ...user.toObject(), role: 'doctor' };
+        }
+      } else if (userType === 'admin') {
+        user = await Admin.findById(userId).select('-password');
+        if (user) {
+          user = { ...user.toObject(), role: 'admin' };
+        }
+      } else {
+        user = await User.findById(userId).select('-password');
+      }
       
       if (user && user.isActive) {
         req.user = user;
       }
     }
-    
+
     next();
   } catch (error) {
-    // Continue without user context if token is invalid
+    // Ignore token errors for optional auth
     next();
   }
-};
-
-module.exports = {
+};module.exports = {
   authenticateToken,
   authorize,
   optionalAuth

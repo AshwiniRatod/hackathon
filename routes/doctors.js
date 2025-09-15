@@ -1,6 +1,7 @@
 const express = require('express');
 const { authenticateToken, authorize } = require('../middleware/auth');
 const User = require('../models/User');
+const Doctor = require('../models/Doctor');
 const HealthRecord = require('../models/HealthRecord');
 const Prescription = require('../models/Prescription');
 const ASHAReport = require('../models/ASHAReport');
@@ -23,10 +24,10 @@ router.post('/register', async (req, res) => {
       name: req.body.name,
       email: req.body.email,
       phone: req.body.phone,
+      password: req.body.password,
       specialty: req.body.specialty,
       qualification: req.body.qualification,
       experience: req.body.experience,
-      role: 'doctor',
       isVerified: false,
       consultationFee: req.body.consultationFee || 500,
       availability: req.body.availability || {
@@ -39,7 +40,7 @@ router.post('/register', async (req, res) => {
       isActive: true
     };
 
-    const doctor = new User(doctorData);
+    const doctor = new Doctor(doctorData);
     await doctor.save();
 
     // Emit real-time event to mobile apps
@@ -83,13 +84,13 @@ router.get('/available', async (req, res) => {
       filter.specialty = specialty;
     }
 
-    const doctors = await User.find(filter)
+    const doctors = await Doctor.find(filter)
       .select('name specialty qualification experience consultationFee rating totalConsultations profileImage availability isActive')
       .sort({ rating: -1, totalConsultations: -1 })
       .skip(skip)
       .limit(parseInt(limit));
 
-    const total = await User.countDocuments(filter);
+    const total = await Doctor.countDocuments(filter);
 
     res.json({
       doctors,
@@ -112,7 +113,7 @@ router.put('/:doctorId/status', authenticateToken, authorize('admin'), async (re
     const { doctorId } = req.params;
     const { isActive, isVerified } = req.body;
 
-    const doctor = await User.findByIdAndUpdate(
+    const doctor = await Doctor.findByIdAndUpdate(
       doctorId,
       { isActive, isVerified },
       { new: true }
@@ -137,7 +138,7 @@ router.put('/:doctorId/status', authenticateToken, authorize('admin'), async (re
 // Get doctor profile
 router.get('/profile', authenticateToken, authorize('doctor'), async (req, res) => {
   try {
-    const doctor = await User.findById(req.user._id).select('-password -otp');
+    const doctor = await Doctor.findById(req.user._id).select('-password -otp');
     res.json({ doctor });
   } catch (error) {
     console.error('Doctor profile fetch error:', error);
@@ -151,9 +152,8 @@ router.put('/profile', authenticateToken, authorize('doctor'), async (req, res) 
     const updates = req.body;
     delete updates.password;
     delete updates.phone;
-    delete updates.role;
 
-    const doctor = await User.findByIdAndUpdate(
+    const doctor = await Doctor.findByIdAndUpdate(
       req.user._id,
       updates,
       { new: true, runValidators: true }

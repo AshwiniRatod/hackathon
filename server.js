@@ -87,7 +87,7 @@ app.use(cors({
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
-// Serve static files for web frontend
+// Serve ic files for web frontend
 app.use('/web', express.static('web'));
 app.use('/assets', express.static('web/assets'));
 

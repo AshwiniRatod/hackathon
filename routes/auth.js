@@ -1,13 +1,15 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const Doctor = require('../models/Doctor');
+const Admin = require('../models/Admin');
 const { authenticateToken } = require('../middleware/auth');
 
 const router = express.Router();
 
 // Generate JWT token
-const generateToken = (userId) => {
-  return jwt.sign({ userId }, process.env.JWT_SECRET, {
+const generateToken = (userId, userType = 'user') => {
+  return jwt.sign({ userId, userType }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRE || '7d'
   });
 };
@@ -17,17 +19,36 @@ router.post('/register', async (req, res) => {
   try {
     const { phone, name, role, password, ...additionalData } = req.body;
 
+    // Determine which model to use based on role
+    let Model = User;
+    let userType = 'user';
+    
+    if (role === 'doctor') {
+      Model = Doctor;
+      userType = 'doctor';
+    } else if (role === 'admin') {
+      Model = Admin;
+      userType = 'admin';
+    }
+
     // Check if user already exists
-    const existingUser = await User.findOne({ phone });
+    const existingUser = await Model.findOne({ phone });
     if (existingUser) {
       return res.status(400).json({ message: 'User already exists with this phone number' });
     }
 
+    // For admin and doctor, also check email if provided
+    if ((role === 'admin' || role === 'doctor') && additionalData.email) {
+      const existingEmailUser = await Model.findOne({ email: additionalData.email });
+      if (existingEmailUser) {
+        return res.status(400).json({ message: 'User already exists with this email' });
+      }
+    }
+
     // Create new user
-    const user = new User({
+    const user = new Model({
       phone,
       name,
-      role,
       password,
       ...additionalData
     });
@@ -44,6 +65,7 @@ router.post('/register', async (req, res) => {
     res.status(201).json({
       message: 'User registered successfully. Please verify with OTP.',
       userId: user._id,
+      userType,
       otp: process.env.NODE_ENV === 'development' ? otp : undefined
     });
   } catch (error) {
@@ -55,9 +77,17 @@ router.post('/register', async (req, res) => {
 // Verify OTP
 router.post('/verify-otp', async (req, res) => {
   try {
-    const { phone, otp } = req.body;
+    const { phone, otp, userType = 'user' } = req.body;
 
-    const user = await User.findOne({ phone });
+    // Determine which model to use
+    let Model = User;
+    if (userType === 'doctor') {
+      Model = Doctor;
+    } else if (userType === 'admin') {
+      Model = Admin;
+    }
+
+    const user = await Model.findOne({ phone });
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
@@ -74,7 +104,7 @@ router.post('/verify-otp', async (req, res) => {
     user.otp = undefined;
     await user.save();
 
-    const token = generateToken(user._id);
+    const token = generateToken(user._id, userType);
 
     res.json({
       message: 'OTP verified successfully',
@@ -83,7 +113,7 @@ router.post('/verify-otp', async (req, res) => {
         id: user._id,
         name: user.name,
         phone: user.phone,
-        role: user.role,
+        role: userType,
         isVerified: user.isVerified
       }
     });
@@ -96,9 +126,17 @@ router.post('/verify-otp', async (req, res) => {
 // Resend OTP
 router.post('/resend-otp', async (req, res) => {
   try {
-    const { phone } = req.body;
+    const { phone, userType = 'user' } = req.body;
 
-    const user = await User.findOne({ phone });
+    // Determine which model to use
+    let Model = User;
+    if (userType === 'doctor') {
+      Model = Doctor;
+    } else if (userType === 'admin') {
+      Model = Admin;
+    }
+
+    const user = await Model.findOne({ phone });
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
@@ -129,11 +167,27 @@ router.post('/login', async (req, res) => {
     const { phone, email, password } = req.body;
 
     let user;
+    let userType = 'user';
     
     // Check if this is email-based login
     if (email) {
-      // Look for user with email (could be admin or doctor)
-      user = await User.findOne({ email: email });
+      // Try to find in Admin collection first
+      user = await Admin.findOne({ email: email });
+      if (user) {
+        userType = 'admin';
+      } else {
+        // Try Doctor collection
+        user = await Doctor.findOne({ email: email });
+        if (user) {
+          userType = 'doctor';
+        } else {
+          // Fallback to User collection
+          user = await User.findOne({ email: email });
+          if (user) {
+            userType = 'user';
+          }
+        }
+      }
       
       if (user) {
         // Verify password using bcrypt
@@ -148,15 +202,17 @@ router.post('/login', async (req, res) => {
         // Fallback to environment variables for admin only
         if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
           // Create admin user if doesn't exist
-          user = new User({
+          user = new Admin({
             email: process.env.ADMIN_EMAIL,
             name: 'System Admin',
-            role: 'admin',
             phone: '9999999999',
             password: process.env.ADMIN_PASSWORD,
-            isVerified: true
+            isVerified: true,
+            adminLevel: 'super_admin',
+            permissions: ['manage_users', 'manage_doctors', 'manage_asha', 'manage_pharmacies', 'view_reports', 'manage_emergency', 'system_config']
           });
           await user.save();
+          userType = 'admin';
         } else {
           return res.status(401).json({ 
             success: false,
@@ -165,8 +221,22 @@ router.post('/login', async (req, res) => {
         }
       }
     } else if (phone) {
-      // Regular user login with phone
+      // Try to find user by phone in all collections
       user = await User.findOne({ phone });
+      if (user) {
+        userType = 'user';
+      } else {
+        user = await Doctor.findOne({ phone });
+        if (user) {
+          userType = 'doctor';
+        } else {
+          user = await Admin.findOne({ phone });
+          if (user) {
+            userType = 'admin';
+          }
+        }
+      }
+
       if (!user) {
         return res.status(401).json({ 
           success: false,
@@ -198,7 +268,7 @@ router.post('/login', async (req, res) => {
     user.lastLogin = new Date();
     await user.save();
 
-    const token = generateToken(user._id);
+    const token = generateToken(user._id, userType);
 
     res.json({
       success: true,
@@ -209,7 +279,7 @@ router.post('/login', async (req, res) => {
         name: user.name,
         phone: user.phone,
         email: user.email,
-        role: user.role,
+        role: userType,
         isVerified: user.isVerified,
         language: user.language
       }
@@ -232,25 +302,27 @@ router.post('/admin/login', async (req, res) => {
     // Check if this is the admin user from environment
     if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
       // Create/find admin user
-      let adminUser = await User.findOne({ email: process.env.ADMIN_EMAIL });
+      let adminUser = await Admin.findOne({ email: process.env.ADMIN_EMAIL });
       
       if (!adminUser) {
         // Create admin user if doesn't exist
-        adminUser = new User({
+        adminUser = new Admin({
           email: process.env.ADMIN_EMAIL,
           name: 'System Admin',
-          role: 'admin',
           phone: '9999999999', // dummy phone for admin
           password: process.env.ADMIN_PASSWORD,
-          isVerified: true
+          isVerified: true,
+          adminLevel: 'super_admin',
+          permissions: ['manage_users', 'manage_doctors', 'manage_asha', 'manage_pharmacies', 'view_reports', 'manage_emergency', 'system_config']
         });
         await adminUser.save();
       }
 
       adminUser.lastLogin = new Date();
+      adminUser.addLoginHistory(req.ip, req.get('User-Agent'));
       await adminUser.save();
 
-      const token = generateToken(adminUser._id);
+      const token = generateToken(adminUser._id, 'admin');
 
       res.json({
         message: 'Admin login successful',
@@ -259,8 +331,9 @@ router.post('/admin/login', async (req, res) => {
           id: adminUser._id,
           name: adminUser.name,
           email: adminUser.email,
-          role: adminUser.role,
-          isVerified: true
+          role: 'admin',
+          isVerified: true,
+          adminLevel: adminUser.adminLevel
         }
       });
     } else {
@@ -275,7 +348,16 @@ router.post('/admin/login', async (req, res) => {
 // Get current user profile
 router.get('/profile', authenticateToken, async (req, res) => {
   try {
-    const user = await User.findById(req.user._id).select('-password -otp');
+    const { userType } = req.user;
+    let Model = User;
+    
+    if (userType === 'doctor') {
+      Model = Doctor;
+    } else if (userType === 'admin') {
+      Model = Admin;
+    }
+
+    const user = await Model.findById(req.user._id).select('-password -otp');
     res.json({ user });
   } catch (error) {
     console.error('Profile fetch error:', error);
@@ -286,12 +368,20 @@ router.get('/profile', authenticateToken, async (req, res) => {
 // Update profile
 router.put('/profile', authenticateToken, async (req, res) => {
   try {
+    const { userType } = req.user;
+    let Model = User;
+    
+    if (userType === 'doctor') {
+      Model = Doctor;
+    } else if (userType === 'admin') {
+      Model = Admin;
+    }
+
     const updates = req.body;
     delete updates.password; // Don't allow password update through this route
     delete updates.phone; // Don't allow phone update through this route
-    delete updates.role; // Don't allow role update through this route
 
-    const user = await User.findByIdAndUpdate(
+    const user = await Model.findByIdAndUpdate(
       req.user._id,
       updates,
       { new: true, runValidators: true }
@@ -310,9 +400,18 @@ router.put('/profile', authenticateToken, async (req, res) => {
 // Change password
 router.put('/change-password', authenticateToken, async (req, res) => {
   try {
+    const { userType } = req.user;
+    let Model = User;
+    
+    if (userType === 'doctor') {
+      Model = Doctor;
+    } else if (userType === 'admin') {
+      Model = Admin;
+    }
+
     const { currentPassword, newPassword } = req.body;
 
-    const user = await User.findById(req.user._id);
+    const user = await Model.findById(req.user._id);
     const isCurrentPasswordValid = await user.comparePassword(currentPassword);
     
     if (!isCurrentPasswordValid) {
