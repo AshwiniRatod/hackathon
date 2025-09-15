@@ -66,13 +66,15 @@ const BackendConnector = {
         }
         
         const baseUrl = `http://localhost:${this.currentPort}/api`;
-        const testEndpoints = [
-            '/auth/login',
-            '/admin/login', 
-            '/doctor/login',
-            '/user/login',
-            '/api/auth/login'
-        ];
+         const testEndpoints = [
+    '/api/admin/login',   // Correct endpoint for admin login
+    '/api/doctor/login',  // Correct endpoint for doctor login
+    '/api/auth/login',    // Optional fallback
+    '/auth/login',        // Optional fallback
+    '/login'              // Optional fallback
+];
+
+
         
         console.log('🧪 Testing authentication endpoints...');
         

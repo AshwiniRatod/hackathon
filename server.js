@@ -76,12 +76,12 @@ app.use(cors({
   credentials: true
 }));
 
-// Rate limiting
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100 // limit each IP to 100 requests per windowMs
-});
-app.use(limiter);
+// Rate limiting - COMMENTED OUT FOR DEVELOPMENT
+// const limiter = rateLimit({
+//   windowMs: 15 * 60 * 1000, // 15 minutes
+//   max: 100 // limit each IP to 100 requests per windowMs
+// });
+// app.use(limiter);
 
 // Body parsing middleware
 app.use(express.json({ limit: '10mb' }));
@@ -103,6 +103,11 @@ app.get('/admin', (req, res) => {
 
 app.get('/admin/dashboard', (req, res) => {
   res.sendFile('web/admin-dashboard.html', { root: __dirname });
+});
+
+// CSP Test route
+app.get('/csp-test', (req, res) => {
+  res.sendFile('web/csp-test.html', { root: __dirname });
 });
 
 // Doctor routes  

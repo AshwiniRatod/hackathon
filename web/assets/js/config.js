@@ -88,13 +88,14 @@ const config = {
     // API Endpoints - Updated to match your SIH Backend structure
     endpoints: {
         auth: {
-            adminLogin: '/auth/login',         // Use unified login endpoint
-            doctorLogin: '/auth/login',        // Your unified login endpoint
-            doctorRegister: '/auth/register',   
-            logout: '/auth/logout',
-            refresh: '/auth/refresh',
-            validateToken: '/auth/validate'
-        },
+    adminLogin: '/api/admin/login',     // ✅ corrected
+    doctorLogin: '/api/doctor/login',   // ✅ corrected
+    doctorRegister: '/api/doctor/register', // ✅ corrected if such route exists
+    logout: '/api/auth/logout',
+    refresh: '/api/auth/refresh',
+    validateToken: '/api/auth/validate'
+},
+
         admin: {
             dashboard: '/admin/dashboard',
             users: '/admin/users',

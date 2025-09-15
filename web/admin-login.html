@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Login - Nabha Telemedicine</title>
-    <link rel="stylesheet" href="assets/css/main.css">
-    <link rel="stylesheet" href="assets/css/components.css">
+    <link rel="stylesheet" href="/assets/css/main.css">
+    <link rel="stylesheet" href="/assets/css/components.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         /* Enhanced Admin Login Styles */
         * {
@@ -555,11 +555,50 @@
             // Auto-focus on email field
             document.getElementById('email').focus();
             
-            // Check if already logged in
+            // Check if already logged in and validate token
             const token = localStorage.getItem('adminToken');
-            if (token) {
-                console.log('Admin already logged in, redirecting...');
-                window.location.href = 'admin-dashboard.html';
+            const adminUser = localStorage.getItem('adminUser');
+            
+            if (token && adminUser) {
+                console.log('Checking existing admin token...');
+                
+                try {
+                    const user = JSON.parse(adminUser);
+                    if (user.role !== 'admin') {
+                        console.log('User is not admin, clearing storage...');
+                        localStorage.removeItem('adminToken');
+                        localStorage.removeItem('adminUser');
+                        return;
+                    }
+                    
+                    // Validate token with server
+                    fetch('/api/admin/dashboard', {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            console.log('Valid admin token found, redirecting to dashboard...');
+                            window.location.href = '/admin/dashboard';
+                        } else {
+                            console.log('Invalid admin token, clearing storage...');
+                            localStorage.removeItem('adminToken');
+                            localStorage.removeItem('adminUser');
+                        }
+                    })
+                    .catch(error => {
+                        console.log('Error validating token, clearing storage...', error);
+                        localStorage.removeItem('adminToken');
+                        localStorage.removeItem('adminUser');
+                    });
+                } catch (error) {
+                    console.error('Error parsing admin user data:', error);
+                    localStorage.removeItem('adminToken');
+                    localStorage.removeItem('adminUser');
+                }
             }
         });
     </script>

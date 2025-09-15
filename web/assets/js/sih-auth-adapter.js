@@ -3,14 +3,15 @@
 
 const SIHAuthAdapter = {
     // Common authentication endpoints for SIH projects
-    authEndpoints: [
-        '/api/auth/login',
-        '/api/admin/login',
-        '/api/user/login',
-        '/auth/login',
-        '/admin/login',
-        '/login'
-    ],
+   authEndpoints: [
+    '/api/auth/login',
+    '/api/admin/login',      // already correct
+    '/api/doctors/login',    // ✅ add this if you are calling doctor login here
+    '/api/user/login',
+    '/auth/login',           // optional fallback; if you don't use it, can remove
+    '/login'
+],
+
     
     // Test which authentication endpoint works
     detectAuthEndpoint: async function(baseUrl) {

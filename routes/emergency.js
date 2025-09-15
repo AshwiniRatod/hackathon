@@ -6,24 +6,24 @@ const NotificationService = require('../services/NotificationService');
 const { authenticateToken } = require('../middleware/auth');
 const rateLimit = require('express-rate-limit');
 
-// Rate limiting for SOS alerts (max 5 per hour per user)
-const sosRateLimit = rateLimit({
-  windowMs: 60 * 60 * 1000, // 1 hour
-  max: 5,
-  message: {
-    error: 'Too many emergency alerts. Please wait before sending another alert.',
-    code: 'RATE_LIMIT_EXCEEDED'
-  },
-  keyGenerator: (req) => req.user?.id || req.ip,
-  standardHeaders: true,
-  legacyHeaders: false,
-});
+// Rate limiting for SOS alerts - COMMENTED OUT FOR DEVELOPMENT
+// const sosRateLimit = rateLimit({
+//   windowMs: 60 * 60 * 1000, // 1 hour
+//   max: 5,
+//   message: {
+//     error: 'Too many emergency alerts. Please wait before sending another alert.',
+//     code: 'RATE_LIMIT_EXCEEDED'
+//   },
+//   keyGenerator: (req) => req.user?.id || req.ip,
+//   standardHeaders: true,
+//   legacyHeaders: false,
+// });
 
 /**
  * POST /api/emergency/sos-alert
  * Send emergency SOS alert
  */
-router.post('/sos-alert', authenticateToken, sosRateLimit, async (req, res) => {
+router.post('/sos-alert', authenticateToken, /* sosRateLimit, */ async (req, res) => {
   try {
     const {
       timestamp,

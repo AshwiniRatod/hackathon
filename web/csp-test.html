@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSP Test - Admin Portal</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .success { color: green; }
+        .error { color: red; }
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔐 CSP & Admin Portal Test</h1>
+    
+    <div class="test-section">
+        <h2>1. Inline Script Test</h2>
+        <p id="inline-test">Testing inline scripts...</p>
+        <script>
+            document.getElementById('inline-test').innerHTML = '<span class="success">✅ Inline scripts working!</span>';
+            console.log('✅ Inline script executed successfully');
+        </script>
+    </div>
+    
+    <div class="test-section">
+        <h2>2. External CSS Test</h2>
+        <p>Font Awesome Icon: <i class="fas fa-heart"></i></p>
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    </div>
+    
+    <div class="test-section">
+        <h2>3. Local CSS Test</h2>
+        <p>Loading from /assets/css/main.css...</p>
+        <link rel="stylesheet" href="/assets/css/main.css">
+    </div>
+    
+    <div class="test-section">
+        <h2>4. Authentication API Test</h2>
+        <button class="test-button" onclick="testAdminAuth()">Test Admin Login API</button>
+        <div id="auth-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>5. Navigation Test</h2>
+        <p>
+            <a href="/admin">🔐 Admin Portal</a> | 
+            <a href="/doctor">🩺 Doctor Portal</a> | 
+            <a href="/">🏠 Home</a>
+        </p>
+    </div>
+    
+    <script>
+        // Test admin authentication
+        async function testAdminAuth() {
+            const resultDiv = document.getElementById('auth-result');
+            resultDiv.innerHTML = '🔄 Testing...';
+            
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: 'admin@nabha.com',
+                        password: 'admin123'
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    resultDiv.innerHTML = `<span class="success">✅ Admin auth working! Role: ${data.user.role}</span>`;
+                } else {
+                    resultDiv.innerHTML = `<span class="error">❌ Auth failed: ${data.message}</span>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<span class="error">❌ Error: ${error.message}</span>`;
+            }
+        }
+        
+        // Test console logging
+        console.log('🚀 CSP Test page loaded successfully');
+        console.log('📊 Testing admin portal functionality...');
+    </script>
+</body>
+</html>

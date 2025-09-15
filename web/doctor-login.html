@@ -422,6 +422,52 @@
             // Auto-focus on email field
             document.getElementById('email').focus();
             
+            // Check if already logged in and validate token
+            const token = localStorage.getItem('doctorToken');
+            const doctorUser = localStorage.getItem('doctorUser');
+            
+            if (token && doctorUser) {
+                console.log('Checking existing doctor token...');
+                
+                try {
+                    const user = JSON.parse(doctorUser);
+                    if (user.role !== 'doctor') {
+                        console.log('User is not doctor, clearing storage...');
+                        localStorage.removeItem('doctorToken');
+                        localStorage.removeItem('doctorUser');
+                        return;
+                    }
+                    
+                    // Validate token with server
+                    fetch('/api/doctors/stats', {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            console.log('Valid doctor token found, redirecting to dashboard...');
+                            window.location.href = '/doctor/dashboard';
+                        } else {
+                            console.log('Invalid doctor token, clearing storage...');
+                            localStorage.removeItem('doctorToken');
+                            localStorage.removeItem('doctorUser');
+                        }
+                    })
+                    .catch(error => {
+                        console.log('Error validating token, clearing storage...', error);
+                        localStorage.removeItem('doctorToken');
+                        localStorage.removeItem('doctorUser');
+                    });
+                } catch (error) {
+                    console.error('Error parsing doctor user data:', error);
+                    localStorage.removeItem('doctorToken');
+                    localStorage.removeItem('doctorUser');
+                }
+            }
+            
             // Periodic backend health check
             setInterval(checkBackendConnection, 30000);
         });
