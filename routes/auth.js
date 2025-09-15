@@ -299,12 +299,35 @@ router.post('/admin/login', async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Check if this is the admin user from environment
-    if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
-      // Create/find admin user
-      let adminUser = await Admin.findOne({ email: process.env.ADMIN_EMAIL });
+    if (!email || !password) {
+      return res.status(400).json({ 
+        message: 'Email and password are required' 
+      });
+    }
+
+    // First, try to find admin in database
+    let adminUser = await Admin.findOne({ email: email.toLowerCase() });
+    console.log('Admin lookup result:', adminUser ? 'Found' : 'Not found', 'for email:', email.toLowerCase());
+    
+    if (adminUser) {
+      console.log('Admin found, verifying password...');
+      // Verify password for database admin
+      const isValidPassword = await adminUser.comparePassword(password);
+      console.log('Password validation result:', isValidPassword);
       
-      if (!adminUser) {
+      if (!isValidPassword) {
+        return res.status(401).json({ message: 'Invalid email or password' });
+      }
+
+      // Check if admin account is active
+      if (!adminUser.isActive) {
+        return res.status(401).json({ message: 'Admin account is deactivated' });
+      }
+
+    } else {
+      console.log('Admin not found in database, checking environment variables...');
+      // Fallback: Check if this is the admin user from environment
+      if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
         // Create admin user if doesn't exist
         adminUser = new Admin({
           email: process.env.ADMIN_EMAIL,
@@ -316,29 +339,39 @@ router.post('/admin/login', async (req, res) => {
           permissions: ['manage_users', 'manage_doctors', 'manage_asha', 'manage_pharmacies', 'view_reports', 'manage_emergency', 'system_config']
         });
         await adminUser.save();
+      } else {
+        return res.status(401).json({ message: 'Invalid email or password' });
       }
-
-      adminUser.lastLogin = new Date();
-      adminUser.addLoginHistory(req.ip, req.get('User-Agent'));
-      await adminUser.save();
-
-      const token = generateToken(adminUser._id, 'admin');
-
-      res.json({
-        message: 'Admin login successful',
-        token,
-        user: {
-          id: adminUser._id,
-          name: adminUser.name,
-          email: adminUser.email,
-          role: 'admin',
-          isVerified: true,
-          adminLevel: adminUser.adminLevel
-        }
-      });
-    } else {
-      return res.status(401).json({ message: 'Invalid admin credentials' });
     }
+
+    // Update login information
+    adminUser.lastLogin = new Date();
+    adminUser.addLoginHistory(req.ip, req.get('User-Agent'));
+    await adminUser.save();
+
+    // Generate token
+    const token = generateToken(adminUser._id, 'admin');
+
+    res.json({
+      message: 'Admin login successful',
+      accessToken: token,
+      tokenType: 'Bearer',
+      expiresIn: process.env.JWT_EXPIRE || '7d',
+      admin: {
+        id: adminUser._id,
+        name: adminUser.name,
+        email: adminUser.email,
+        phone: adminUser.phone,
+        adminLevel: adminUser.adminLevel,
+        permissions: adminUser.permissions,
+        department: adminUser.department,
+        employeeId: adminUser.employeeId,
+        language: adminUser.language,
+        isVerified: adminUser.isVerified,
+        lastLogin: adminUser.lastLogin
+      }
+    });
+
   } catch (error) {
     console.error('Admin login error:', error);
     res.status(500).json({ message: 'Admin login failed', error: error.message });
