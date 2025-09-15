@@ -3,6 +3,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useSelector } from 'react-redux';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import {Provider} from 'react-redux';
 
 // Auth Screens
 import OnboardingScreen from '../screens/auth/OnboardingScreen';
@@ -10,6 +11,7 @@ import PhoneInputScreen from '../screens/auth/PhoneInputScreen';
 import OTPVerificationScreen from '../screens/auth/OTPVerificationScreen';
 import RoleSelectionScreen from '../screens/auth/RoleSelectionScreen';
 import ProfileSetupScreen from '../screens/auth/ProfileSetupScreen';
+import LoginRegisterScreen from '../screens/auth/LoginRegisterScreen';
 
 // Patient Screens
 import PatientDashboard from '../screens/patient/PatientDashboardScreen';
@@ -42,12 +44,14 @@ const Tab = createBottomTabNavigator();
 // Auth Stack Navigator
 const AuthNavigator = () => {
   return (
-    <Stack.Navigator 
-      screenOptions={{ 
+    <Stack.Navigator
+      initialRouteName="LoginRegister"
+      screenOptions={{
         headerShown: false,
-        cardStyle: { backgroundColor: theme.colors.background }
+        cardStyle: { backgroundColor: theme.colors.background },
       }}
     >
+      <Stack.Screen name="LoginRegister" component={LoginRegisterScreen} />
       <Stack.Screen name="Onboarding" component={OnboardingScreen} />
       <Stack.Screen name="PhoneInput" component={PhoneInputScreen} />
       <Stack.Screen name="OTPVerification" component={OTPVerificationScreen} />
