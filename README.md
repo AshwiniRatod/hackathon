@@ -85,7 +85,7 @@ Our comprehensive telemedicine solution addresses the critical healthcare access
 ```
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
 │   Mobile App    │    │  Web Dashboard  │    │  Admin Portal   │
-│  (React Native) │    │   (Vanilla JS)  │    │   (Vanilla JS)  │
+│  (React Native) │    │                 │    │                 │
 └─────────┬───────┘    └─────────┬───────┘    └─────────┬───────┘
           │                      │                      │
           └──────────────────────┼──────────────────────┘
